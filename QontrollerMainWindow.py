@@ -4,6 +4,7 @@ import qontroller
 
 from command_functions import *
 from device import Device
+from picam_settings import PicamSettings
 
 
 class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
@@ -16,6 +17,8 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.host_list = []
         self.currentDeviceID = None
 
+        self.comboTimeoutUnit.addItems(["Seconds", "Minutes", "Hours"])
+
         # Signals
 
         self.btnRefresh.clicked.connect(self.refresh_view)
@@ -26,6 +29,9 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         # Execute on startup
 
         self.scan_devices()
+
+        s = PicamSettings(self)
+        print(s.time_interval)
 
 
     def add_device(self, name):
@@ -53,7 +59,15 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             print("Please first select a device")
 
     def on_listBoxDevices_clicked(self, index):
-        #print('selected item index found at %s with data: %s' % (index.row(), index.data()))
         self.currentDeviceID = index.row()
         self.refresh_view()
+
+    @QtCore.pyqtSlot(int)
+    def on_comboTimeoutUnit_currentIndexChanged(self, index):
+        if index == 0:
+            self.labelTimeout.setText("Timeout (s)")
+        elif index == 1:
+            self.labelTimeout.setText("Timeout (min)")
+        elif index == 2:
+            self.labelTimeout.setText("Timeout (h)")
 
