@@ -1,6 +1,7 @@
 class PicamSettings:
     def __init__(self, app):
         self.timeout = None
+        self.timeout_unit = None
         self.time_interval = None
         self.averaging = None
         self.jpg_quality = None
@@ -13,7 +14,8 @@ class PicamSettings:
         self.update(app)
 
     def update(self, app):
-        self.timeout = app.spinTimeout.value()
+        self.timeout_unit = app.comboTimeoutUnit.currentIndex()
+        self.timeout = app.spinTimeout.value() * (60 ^ self.timeout_unit)
         self.time_interval = app.spinTimeInterval.value()
         self.averaging = app.spinAveraging.value()
         self.jpg_quality = app.spinJpgQuality.value()

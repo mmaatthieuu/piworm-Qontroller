@@ -22,6 +22,16 @@ class Device:
         else:
             return True
 
+    @property
+    def is_uptodate(self):
+        stdin, stdout, stderr = self.ssh.exec_command("cd /home/matthieu/piworm && git fetch --dry-run", get_pty=True)
+        if stdout.readline() == '':
+            print(device + " up to date")
+            return True
+        else:
+            print("Update available for " + device)
+            return False
+
     def ssh_connect(self):
 
         self.ssh.load_system_host_keys()
