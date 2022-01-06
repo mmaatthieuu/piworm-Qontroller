@@ -34,7 +34,7 @@ class Device:
 
     def ssh_connect(self):
 
-        self.ssh.load_host_keys()
+        self.ssh.load_system_host_keys()
         self.ssh.connect(self.name, port=22, username='matthieu', timeout=3)
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
