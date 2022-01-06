@@ -23,8 +23,7 @@ class Device:
             return True
 
     def ssh_connect(self):
-        #if self.ssh:
-        #    self.ssh.close()
+
         self.ssh.load_system_host_keys()
         self.ssh.connect(self.name, port=22, username='matthieu', timeout=3)
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -60,22 +59,3 @@ class Device:
             print(line, end="")
 
         return self.read_remote_frame("/home/matthieu/tmp/preview.jpg")
-"""
-
-    def get_frame(self):
-
-
-
-
-        # time.sleep(4)
-        # out = stdout.read()
-        # for line in stdout.readlines():
-        #     print(line, end="")
-        # print("Changing image to %s" % preview_file)
-        try:
-            return GdkPixbuf.Pixbuf.new_from_file_at_scale(preview_file, frame_width, -1, True)
-        except gi.repository.GLib.Error as e:
-            print(e)
-            print("The NAS is probably not mounted...")
-
-"""

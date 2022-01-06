@@ -23,8 +23,6 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         self.btnRefresh.clicked.connect(self.refresh_view)
         self.btnRescanDevices.clicked.connect(self.scan_devices)
-        #self.listBoxDevices.clicked.connect(self.on_listBoxDevices_clicked)
-
 
         # Execute on startup
 
