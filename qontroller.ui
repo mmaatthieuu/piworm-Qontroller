@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>3033</width>
-    <height>1995</height>
+    <width>3042</width>
+    <height>2111</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,7 +51,7 @@
           <x>0</x>
           <y>0</y>
           <width>2718</width>
-          <height>2043</height>
+          <height>2047</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -62,7 +62,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="labelDisplay">
            <property name="cursor">
             <cursorShape>CrossCursor</cursorShape>
            </property>
@@ -234,9 +234,6 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
-            </property>
            </widget>
           </item>
           <item>
@@ -259,8 +256,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>3033</width>
-     <height>25</height>
+     <width>3042</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

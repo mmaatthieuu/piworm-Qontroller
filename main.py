@@ -4,9 +4,6 @@ import sys
 
 from QontrollerMainWindow import QontrollerMainWindow
 
-
-
-
 def main():
     app = QApplication(sys.argv)
     form = QontrollerMainWindow()
