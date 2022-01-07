@@ -1,5 +1,6 @@
 from PyQt5 import QtGui, QtCore
 import paramiko
+import os
 
 class Device:
 
@@ -9,7 +10,13 @@ class Device:
         self.uptodate = uptodate
 
         self.ssh = paramiko.SSHClient()
-        self.ssh_connect()
+        try:
+            self.ssh_connect()
+        except paramiko.ssh_exception.SSHException as e:
+            print(e)
+            os.system("ssh %s 'exit 0'" % name)
+            os.system("exit")
+            self.ssh_connect()
 
     def __del__(self):
         self.ssh.close()

@@ -46,8 +46,9 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         with open("hosts_list.txt", 'r') as hosts_list:
             for host in hosts_list.read().splitlines():
                 # device = "piworm%02d.epfl.ch" % i
-                if os.system("ping -c 1 -q -W 0.3 " + host) == 0:
-                    self.add_device(host)
+                if host[0] != '#':
+                    if os.system("ping -c 1 -q -W 0.3 " + host) == 0:
+                        self.add_device(host)
 
     def refresh_view(self):
         if self.currentDeviceID is not None:
