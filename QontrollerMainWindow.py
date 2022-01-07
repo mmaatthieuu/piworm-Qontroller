@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 import qontroller
 
+
 from command_functions import *
 from device import Device
 from picam_settings import PicamSettings
@@ -28,8 +29,6 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         self.scan_devices()
 
-        s = PicamSettings(self)
-        print(s.time_interval)
 
 
     def add_device(self, name):
@@ -37,6 +36,8 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         new_device = Device(name, id=id)
         new_item = QtWidgets.QListWidgetItem(name)
 
+        ch = QtWidgets.QCheckBox()
+        #new_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
         self.listBoxDevices.addItem(new_item)
         self.host_list.append(new_device)
 
@@ -53,7 +54,8 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def refresh_view(self):
         if self.currentDeviceID is not None:
             currentDevice = self.host_list[self.currentDeviceID]
-            self.labelDisplay.setPixmap(currentDevice.get_frame())
+            s = PicamSettings(self)
+            self.labelDisplay.setPixmap(currentDevice.get_frame(s))
         else:
             print("Please first select a device")
 
@@ -70,3 +72,34 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         elif index == 2:
             self.labelTimeout.setText("Timeout (h)")
 
+    @QtCore.pyqtSlot()
+    def on_btnCheckUpdates_clicked(self):
+        updatable_devices = []
+        for d in self.host_list:
+            if not d.is_uptodate:
+                updatable_devices.append(d)
+
+        return updatable_devices
+
+    @QtCore.pyqtSlot()
+    def on_btnUpdateAll_clicked(self):
+        for d in self.on_btnCheckUpdates_clicked():
+            d.update()
+
+    @QtCore.pyqtSlot()
+    def on_btnRecord_clicked(self):
+        s = PicamSettings(self)
+        for d in self.host_list:
+            d.record(s)
+
+    @QtCore.pyqtSlot()
+    def on_btnStopRecord_clicked(self):
+        for d in self.running_devices():
+            d.stop()
+
+    def running_devices(self):
+        running_list = []
+        for d in self.host_list:
+            if d.is_running:
+                running_list.append(d)
+        return running_list
