@@ -160,7 +160,7 @@
           <item>
            <widget class="QPushButton" name="btnLiveView">
             <property name="text">
-             <string>PushButton</string>
+             <string>Toggle Live View</string>
             </property>
             <property name="checkable">
              <bool>true</bool>

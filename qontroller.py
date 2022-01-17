@@ -252,7 +252,7 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "Focus out"))
         self.pushButton_2.setText(_translate("MainWindow", "Focus in"))
         self.btnRefresh.setText(_translate("MainWindow", "Refresh View"))
-        self.btnLiveView.setText(_translate("MainWindow", "PushButton"))
+        self.btnLiveView.setText(_translate("MainWindow", "Toggle Live View"))
         self.btnFitView.setText(_translate("MainWindow", "Fit View to Window"))
         self.btnOriginalView.setText(_translate("MainWindow", "Original View"))
         self.label.setText(_translate("MainWindow", "Parameters"))

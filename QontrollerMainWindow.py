@@ -178,7 +178,7 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         for d in self.on_btnCheckUpdates_clicked():
             d.update()
 
-    def showdialogWarning(self, main_text, additional_text):
+    def showdialogWarning(self, main_text, additional_text=None):
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Warning)
 
@@ -201,6 +201,7 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             s = PicamSettings(self)
             for d in devices_marked_for_recording:
                 d.record(s)
+
         # Else ask to do the update
         else:
             self.showdialogWarning(main_text="Some devices are out of date. Please update them before recording.")
