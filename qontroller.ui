@@ -36,6 +36,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="horizontalScrollBarPolicy">
         <enum>Qt::ScrollBarAsNeeded</enum>
        </property>
@@ -45,13 +48,16 @@
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
        <widget class="QWidget" name="scrollAreaWidgetContents_6">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
           <width>2718</width>
-          <height>2047</height>
+          <height>2043</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -139,7 +145,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>18</height>
+              <height>10</height>
              </size>
             </property>
            </spacer>
@@ -148,6 +154,52 @@
            <widget class="QPushButton" name="btnRefresh">
             <property name="text">
              <string>Refresh View</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnLiveView">
+            <property name="text">
+             <string>PushButton</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnFitView">
+            <property name="text">
+             <string>Fit View to Window</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnOriginalView">
+            <property name="text">
+             <string>Original View</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="sliderZoom">
+            <property name="minimum">
+             <number>100</number>
+            </property>
+            <property name="maximum">
+             <number>500</number>
+            </property>
+            <property name="singleStep">
+             <number>1</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::TicksAbove</enum>
+            </property>
+            <property name="tickInterval">
+             <number>100</number>
             </property>
            </widget>
           </item>
@@ -162,7 +214,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>18</height>
+              <height>10</height>
              </size>
             </property>
            </spacer>
@@ -228,7 +280,7 @@
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>40</height>
+                <height>10</height>
                </size>
               </property>
              </spacer>
@@ -365,22 +417,6 @@
            </widget>
           </item>
           <item>
-           <spacer name="verticalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
            <widget class="QPushButton" name="btnStopRecord">
             <property name="text">
              <string>Stop Recording</string>
@@ -398,7 +434,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>58</height>
+              <height>10</height>
              </size>
             </property>
            </spacer>
@@ -468,7 +504,7 @@
      <x>0</x>
      <y>0</y>
      <width>3042</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
