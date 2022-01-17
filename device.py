@@ -62,7 +62,7 @@ class Device:
                 connected = True
             except paramiko.ssh_exception.SSHException as e:
                 print(e)
-                os.system("ssh-copy-id %s" % name)
+                os.system("ssh-copy-id %s" % self.name)
                 i += 1
 
 
