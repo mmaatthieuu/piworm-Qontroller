@@ -57,7 +57,7 @@
           <x>0</x>
           <y>0</y>
           <width>2718</width>
-          <height>2043</height>
+          <height>2047</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -171,6 +171,9 @@
            <widget class="QPushButton" name="btnFitView">
             <property name="text">
              <string>Fit View to Window</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -504,7 +507,7 @@
      <x>0</x>
      <y>0</y>
      <width>3042</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

@@ -20,12 +20,9 @@ class Worker(QtCore.QObject):
         self.main_window = main_window
 
     def do_work(self):
-        i = 1
         while self.continue_run:  # give the loop a stoppable condition
-            print(i)
             #QtCore.QThread.sleep(1)
             self.main_window.refresh_view()
-            i = i + 1
         self.finished.emit()  # emit the finished signal when the loop is done
 
     def stop(self):
@@ -48,6 +45,7 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         self.full_pixmap = None
         self.zoom_value = self.sliderZoom.value()
+        self.fit_view_status = self.btnFitView.isChecked()
 
         self.do_auto_refresh = self.btnLiveView.isChecked()
 
@@ -119,10 +117,18 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             s = PicamSettings(self)
             self.full_pixmap = currentDevice.get_frame(s)
             # self.labelDisplay.setPixmap(self.full_pixmap)
-            self.labelDisplay.setPixmap(self.full_pixmap.scaled(self.full_pixmap.size() * self.sliderZoom.value() / 100,
-                                                                QtCore.Qt.KeepAspectRatio))
+
+            self.display_frame_pixmap(self.full_pixmap)
+
         else:
             print("Please first select a device")
+
+    def display_frame_pixmap(self, pxm):
+        if self.fit_view_status:
+            self.labelDisplay.setPixmap(pxm.scaled(self.scrollArea.size(), QtCore.Qt.KeepAspectRatio))
+        else:
+            self.labelDisplay.setPixmap(pxm.scaled(self.full_pixmap.size() * self.sliderZoom.value() / 100,
+                                                                QtCore.Qt.KeepAspectRatio))
 
     def auto_refresh(self):
         while self.do_auto_refresh:
@@ -144,6 +150,14 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     def zoom(self):
         self.labelDisplay.setPixmap(self.full_pixmap.scaled(self.full_pixmap.size()*self.sliderZoom.value()/100, QtCore.Qt.KeepAspectRatio))
+
+    def fit_view(self, pxm):
+        if self.fit_view_status:
+            return pxm.scaled(self.scrollArea.size(), QtCore.Qt.KeepAspectRatio)
+        return pxm
+
+    def set_pixmap_scaling(self, pxm):
+        pass
 
 
     @QtCore.pyqtSlot(QtWidgets.QListWidgetItem, QtWidgets.QListWidgetItem)
@@ -222,10 +236,20 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         return running_list
 
 
-    @QtCore.pyqtSlot()
-    def on_btnFitView_clicked(self):
-        pxm = self.labelDisplay.pixmap()
-        self.labelDisplay.setPixmap(self.scaled(self.scrollArea.size(), QtCore.Qt.KeepAspectRatio))
+
+    @QtCore.pyqtSlot(bool)
+    def on_btnFitView_clicked(self, checked):
+
+        self.fit_view_status = checked
+
+        if checked:
+            self.sliderZoom.setValue(100)
+            self.display_frame_pixmap(self.full_pixmap)
+
+            #print(self.sliderZoom.getMinimum())
+
+
+
 
     @QtCore.pyqtSlot()
     def on_btnOriginalView_clicked(self):
@@ -233,7 +257,6 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     @QtCore.pyqtSlot(bool)
     def on_btnLiveView_clicked(self, checked):
-        print(checked)
         self.do_auto_refresh = checked
         if checked:
             self.thread = QtCore.QThread()
@@ -251,3 +274,11 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             self.thread.start()
         else:
             self.stop_thread()
+
+    ### TAB 2
+
+    @QtCore.pyqtSlot()
+    def on_btnOpenFile_clicked(self):
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file',
+                                                      '/home/matthieu/data/PIWORM', "Image files (*.jpg *.gif)")
+        self.labelDisplay_2.setPixmap(QtGui.QPixmap(fname[0]))
