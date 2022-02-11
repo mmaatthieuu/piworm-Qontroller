@@ -2,12 +2,10 @@ import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
-import qontroller
+from . import qontroller
 
-
-from command_functions import *
-from device import Device
-from picam_settings import PicamSettings
+from .device import Device
+from .picam_settings import PicamSettings
 
 
 class Worker(QtCore.QObject):

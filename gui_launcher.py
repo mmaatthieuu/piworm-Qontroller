@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication
 import sys
 
-from QontrollerUI import QontrollerUI
+from src.QontrollerUI import QontrollerUI
 
 def main():
     app = QApplication(sys.argv)

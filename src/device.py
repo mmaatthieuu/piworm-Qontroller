@@ -6,8 +6,6 @@ from datetime import datetime
 
 from math import log10,ceil
 
-from picam_settings import PicamSettings
-
 class Device:
 
     def __init__(self, name, id, uptodate=None):
