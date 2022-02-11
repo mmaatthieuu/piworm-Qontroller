@@ -34,14 +34,15 @@ class ContextmenuDevice(QtWidgets.QMenu):
         test_action = QtWidgets.QAction("print yo", triggered=self.test_function)
         self.addAction(test_action)
 
-class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
+class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     stop_signal = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
-        super(QontrollerMainWindow, self).__init__(parent)
+        super(QontrollerUI, self).__init__(parent)
         self.setupUi(self)
 
-        self.resize(QtWidgets.QDesktopWidget().availableGeometry(self).size() * 0.8)
+        #self.resize(QtWidgets.QDesktopWidget().availableGeometry(self).size() * 0.8)
+        self.centerandresize()
 
         # Attributes
 
@@ -98,6 +99,14 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     #def on_context_menu(self, point): # not used anymore
     #    # show context menu
      #   self.popMenu.exec_(self.listBoxDevices.mapToGlobal(point))
+    def centerandresize(self, rat=[0.85, 0.9]):
+        geo = QtWidgets.QDesktopWidget().availableGeometry()
+        w, h = geo.width(), geo.height()
+        self.resize(w * rat[0], h * rat[1])
+        qr = self.frameGeometry()
+        cp = geo.center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def stop_thread(self):
         self.stop_signal.emit()  # emit the finished signal on stop
@@ -121,7 +130,7 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                 print(item.text())
             """
             return True
-        return super(QontrollerMainWindow, self).eventFilter(source, event)
+        return super(QontrollerUI, self).eventFilter(source, event)
 
     def add_device(self, name):
         id = self.listBoxDevices.count()
