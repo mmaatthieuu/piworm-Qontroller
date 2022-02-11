@@ -493,6 +493,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="btnShutdown">
+            <property name="text">
+             <string>Shutdown All</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>

@@ -28,6 +28,11 @@ class Worker(QtCore.QObject):
     def stop(self):
         self.continue_run = False  # set the run condition to false on stop
 
+class ContextmenuDevice(QtWidgets.QMenu):
+    def __init__(self):
+        QtWidgets.QMenu.__init__(self)
+        test_action = QtWidgets.QAction("print yo", triggered=self.test_function)
+        self.addAction(test_action)
 
 class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     stop_signal = QtCore.pyqtSignal()
@@ -59,6 +64,16 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.listBoxDevices.currentItemChanged.connect(self.current_item_changed)
         self.sliderZoom.valueChanged.connect(self.zoom)
 
+
+        self.listBoxDevices.installEventFilter(self)
+
+        # create context menu - not used anymore
+        self.popMenu = QtWidgets.QMenu(self)
+        self.popMenu.addAction(QtWidgets.QAction('test0', self, triggered=self.test_function))
+        self.popMenu.addAction(QtWidgets.QAction('test1', self))
+        self.popMenu.addSeparator()
+        self.popMenu.addAction(QtWidgets.QAction('test2', self))
+
         # Execute on startup
 
         self.scan_devices()
@@ -80,10 +95,33 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         # When stop_btn is clicked this runs. Terminates the worker and the thread.
 
+    #def on_context_menu(self, point): # not used anymore
+    #    # show context menu
+     #   self.popMenu.exec_(self.listBoxDevices.mapToGlobal(point))
+
     def stop_thread(self):
         self.stop_signal.emit()  # emit the finished signal on stop
 
+    def test_function(self):
+        print("yo")
 
+    def eventFilter(self, source, event):
+        if (event.type() == QtCore.QEvent.ContextMenu and
+                source is self.listBoxDevices):
+            menu = ContextmenuDevice()
+            if menu.exec_(event.globalPos()):
+                item = source.itemAt(event.pos())
+
+            # je pense que c'est plus simple comme en dessous
+            """
+            menu = QtWidgets.QMenu()
+            menu.addAction('Open Window')
+            if menu.exec_(event.globalPos()):
+                item = source.itemAt(event.pos())
+                print(item.text())
+            """
+            return True
+        return super(QontrollerMainWindow, self).eventFilter(source, event)
 
     def add_device(self, name):
         id = self.listBoxDevices.count()
@@ -99,6 +137,22 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         #new_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
         self.listBoxDevices.addItem(new_item)
         self.host_list.append(new_device)
+
+    def right_menu_device(self, pos):
+        menu = QMenu(self.listBoxDevices)
+
+        # Add menu options
+        hello_option = menu.addAction('Hello World')
+        goodbye_option = menu.addAction('GoodBye')
+        exit_option = menu.addAction('Exit')
+
+        # Menu option events
+        hello_option.triggered.connect(lambda: print('Hello World'))
+        goodbye_option.triggered.connect(lambda: print('Goodbye'))
+        exit_option.triggered.connect(lambda: exit())
+
+        # Position
+        menu.exec_(self.mapToGlobal(pos))
 
     def scan_devices(self):
         self.listBoxDevices.clear()
@@ -274,6 +328,11 @@ class QontrollerMainWindow(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             self.thread.start()
         else:
             self.stop_thread()
+
+    @QtCore.pyqtSlot()
+    def on_btnShutdown_clicked(self):
+        for d in self.host_list:
+            d.shutdown()
 
     ### TAB 2
 

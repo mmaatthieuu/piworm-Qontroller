@@ -150,3 +150,9 @@ class Device:
     def stop(self):
         stdin, stdout, stderr = self.ssh.exec_command("pkill picam", get_pty=True)
         print("Device %s stopped" % self.name)
+
+    def shutdown(self):
+        print("shutting down %s" % self.name)
+        stdin, stdout, stderr = self.ssh.exec_command("sudo poweroff", get_pty=True)
+        del self
+
