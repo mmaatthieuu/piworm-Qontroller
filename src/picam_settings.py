@@ -10,6 +10,7 @@ class PicamSettings:
         self.brightness = None
         self.compress = None
         self.start_frame = None
+        self.led_intensity = None
 
         self.update(app)
 
@@ -24,3 +25,4 @@ class PicamSettings:
         self.brightness = app.spinBrightness.value()
         self.compress = app.spinArchiveSize.value()
         self.start_frame = app.spinStartingFrame.value()
+        self.led_intensity = app.spinLEDIntensity.value()

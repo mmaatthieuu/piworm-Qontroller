@@ -86,8 +86,8 @@ class Device:
         return self.read_remote_frame("/home/matthieu/tmp/last_frame.jpg")
 
     def acquire_new_frame(self, s):
-        command = 'picam -o /home/matthieu/tmp/preview.jpg -v -t 0 -avg %d -ti %f -q %d -ss %d -br %d -iso %d' % \
-                  (s.averaging, s.time_interval, s.jpg_quality, s.shutter_speed, s.brightness, s.iso)
+        command = 'picam -o /home/matthieu/tmp/preview.jpg -v -t 0 -avg %d -ti %f -q %d -ss %d -br %d -iso %d -l %d' % \
+                  (s.averaging, s.time_interval, s.jpg_quality, s.shutter_speed, s.brightness, s.iso, s.led_intensity)
 
         stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
         for line in iter(stdout.readline, ""):
@@ -137,6 +137,7 @@ class Device:
                           f'--brightness {s.brightness} ' \
                           f'--compress {s.compress} ' \
                           f'--start-frame {s.start_frame} ' \
+                          f'--led-intensity {s.led_intensity}' \
                           f'--output {new_folder_name_child}/%0{int(ceil(log10(s.timeout)))}d.jpg ' \
                           f'--save-nfo'
             # rec_command = "picam --help"
