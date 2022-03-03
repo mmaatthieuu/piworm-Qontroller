@@ -3,6 +3,7 @@ import paramiko
 import os
 import time
 from datetime import datetime
+import subprocess
 
 from math import log10,ceil
 
@@ -14,6 +15,8 @@ class Device:
         self.uptodate = uptodate
 
         self.ssh = paramiko.SSHClient()
+        
+        self.username = "matthieu"
 
         self.ssh_connect()
 
@@ -63,10 +66,11 @@ class Device:
                 connected = True
             except paramiko.ssh_exception.SSHException as e:
                 print(e)
-                os.system("ssh-copy-id %s" % self.name)
+                if os.name == 'nt':
+                    subprocess.run([r'type', r'%userprofile%\.ssh\id_rsa.pub','|','ssh',f'{self.username}@{self.name}',r"cat >> .ssh/authorized_keys"], shell=True)
+                else:
+                    os.system(f"ssh-copy-id {self.username}@{self.name}")
                 i += 1
-
-
 
     def get_frame(self,settings):
         if self.is_running:

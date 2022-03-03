@@ -169,8 +169,12 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                 # device = "piworm%02d.epfl.ch" % i
                 # Check if device name is marked as comment
                 if host[0] != '#':
-                    if os.system("ping -c 1 -q -W 0.3 " + host) == 0:
-                        self.add_device(host)
+                    if os.name == 'nt':
+                        if os.system("ping -n 1 -w 300 " + host) == 0:
+                            self.add_device(host)
+                    else:
+                        if os.system("ping -c 1 -q -W 0.3 " + host) == 0:
+                            self.add_device(host)
 
     def refresh_view(self):
         if self.currentDeviceID is not None:
