@@ -44,6 +44,9 @@ class Device:
         if self.is_running:
             print("Device %s is running : update skipped" % self.name)
         else:
+            ## hard pull
+            # stdin, stdout, stderr = self.ssh.exec_command(
+            #    "cd /home/matthieu/piworm && git reset --hard origin/main && git pull", get_pty=True)
             stdin, stdout, stderr = self.ssh.exec_command("cd /home/matthieu/piworm && git pull", get_pty=True)
             for line in iter(stdout.readline, ""):
                 print(line, end="")
@@ -86,7 +89,7 @@ class Device:
         return self.read_remote_frame("/home/matthieu/tmp/last_frame.jpg")
 
     def acquire_new_frame(self, s):
-        command = 'picam -o /home/matthieu/tmp/preview.jpg -v -t 0 -avg %d -ti %f -q %d -ss %d -br %d -iso %d -l %d' % \
+        command = 'picam -o /home/matthieu/tmp/preview.jpg -v -t 0 -avg %d -ti %f -q %d -ss %d -br %d -iso %d -l %d -vv' % \
                   (s.averaging, s.time_interval, s.jpg_quality, s.shutter_speed, s.brightness, s.iso, s.led_intensity)
 
         stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
@@ -129,6 +132,7 @@ class Device:
                 # raise Exception(stdout.readline())
             rec_command = f'picam ' \
                           f'--timeout {s.timeout} ' \
+                          f'' \
                           f'--time-interval {s.time_interval} ' \
                           f'--average {s.averaging} ' \
                           f'--quality {s.jpg_quality} ' \
@@ -137,7 +141,7 @@ class Device:
                           f'--brightness {s.brightness} ' \
                           f'--compress {s.compress} ' \
                           f'--start-frame {s.start_frame} ' \
-                          f'--led-intensity {s.led_intensity}' \
+                          f'--led-intensity {s.led_intensity} ' \
                           f'--output {new_folder_name_child}/%0{int(ceil(log10(s.timeout)))}d.jpg ' \
                           f'--save-nfo'
             # rec_command = "picam --help"

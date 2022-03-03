@@ -97,10 +97,10 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     #def on_context_menu(self, point): # not used anymore
     #    # show context menu
      #   self.popMenu.exec_(self.listBoxDevices.mapToGlobal(point))
-    def centerandresize(self, rat=[0.85, 0.9]):
+    def centerandresize(self, rat=[0.75, 0.75]):
         geo = QtWidgets.QDesktopWidget().availableGeometry()
         w, h = geo.width(), geo.height()
-        self.resize(w * rat[0], h * rat[1])
+        self.resize(int(w * rat[0]), int(h * rat[1]))
         qr = self.frameGeometry()
         cp = geo.center()
         qr.moveCenter(cp)
