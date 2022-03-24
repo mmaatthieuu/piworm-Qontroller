@@ -6,6 +6,7 @@ from datetime import datetime
 import subprocess
 
 from math import log10,ceil
+from src.QontrollerUI import *
 
 class Device:
 
@@ -61,7 +62,7 @@ class Device:
         while (not connected and i < 3):
             try:
                 self.ssh.load_system_host_keys()
-                self.ssh.connect(self.name, port=22, username='matthieu', timeout=3)
+                self.ssh.connect(self.name, port=22, username=self.username, timeout=3)
                 self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
                 connected = True
             except paramiko.ssh_exception.SSHException as e:
@@ -71,6 +72,21 @@ class Device:
                 else:
                     os.system(f"ssh-copy-id {self.username}@{self.name}")
                 i += 1
+
+    def receive_json_config_file(self, file):
+        with self.ssh.open_sftp() as sftp:
+            remote_folder = f"/home/{self.username}/.config/wormstation"
+            remote_path = f'{remote_folder}/{os.path.basename(file)}'
+            try:
+                sftp.mkdir(remote_folder)
+            except IOError:
+                # Folder already exists
+                pass
+
+            sftp.put(file, remote_path)
+
+        return remote_path
+
 
     def get_frame(self,settings):
         if self.is_running:
@@ -86,73 +102,51 @@ class Device:
         new_pixmap = QtGui.QPixmap()
         ok = new_pixmap.loadFromData(ba, "JPG")
 
+        sftp.close()
+
         return new_pixmap
 
     def import_last_frame_from_device(self):
         print("Device is running : getting last frame")
         return self.read_remote_frame("/home/matthieu/tmp/last_frame.jpg")
 
-    def acquire_new_frame(self, s):
-        command = 'picam -o /home/matthieu/tmp/preview.jpg -v -t 0 -avg %d -ti %f -q %d -ss %d -br %d -iso %d -l %d -vv' % \
+    def acquire_new_frame(self, config_file):
+        self.start(config_file, background_mode=False)
+        """
+        command = 'picam -o /home/matthieu/tmp/preview.jpg -v -t 0 -avg %d -ti %f -q %d -ss %d -br %d -iso %d -l %d -vv -a' % \
                   (s.averaging, s.time_interval, s.jpg_quality, s.shutter_speed, s.brightness, s.iso, s.led_intensity)
-
         stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
         for line in iter(stdout.readline, ""):
             print(line, end="")
+        """
+        return self.read_remote_frame("/home/matthieu/tmp/last_frame.jpg")
 
-        return self.read_remote_frame("/home/matthieu/tmp/preview.jpg")
+    def record(self, config_file):
 
-    def record(self, s):
-        dt = datetime.now()
-
-
-        folder_created = False
         print(self.name)
         if self.is_running:
             print("WARNING : Device %s is already running. Recording ignored")
         else:
+            #print(s)
+            print("\n\n\n")
+            self.start(config_file, background_mode=True)
 
-            # Create the new parent folder
-            if not folder_created:
-                new_folder_name = "/home/matthieu/NAS/PIWORM/%s" % dt.strftime('%Y%m%d')
-                stdin, stdout, stderr = self.ssh.exec_command("mkdir " + new_folder_name, get_pty=True)
-                if stdout.readline() == '':
-                    print(new_folder_name + " created")
-                    folder_created = True
-                else:
-                    for line in iter(stdout.readline, ""):
-                        print(line, end="")
-                    # raise Exception(stdout.readline())
-            # nohup ./test_job.sh > test_job_log.out 2>&1 &
 
-            # create the new child folder
-            new_folder_name_child = new_folder_name + "/" + self.name
-            stdin, stdout, stderr = self.ssh.exec_command("mkdir " + new_folder_name_child, get_pty=True)
-            if stdout.readline() == '':
-                print(new_folder_name_child + " created")
-            else:
-                for line in iter(stdout.readline, ""):
-                    print(line, end="")
-                # raise Exception(stdout.readline())
-            rec_command = f'picam ' \
-                          f'--timeout {s.timeout} ' \
-                          f'' \
-                          f'--time-interval {s.time_interval} ' \
-                          f'--average {s.averaging} ' \
-                          f'--quality {s.jpg_quality} ' \
-                          f'--iso {s.iso} ' \
-                          f'--shutter-speed {s.shutter_speed} ' \
-                          f'--brightness {s.brightness} ' \
-                          f'--compress {s.compress} ' \
-                          f'--start-frame {s.start_frame} ' \
-                          f'--led-intensity {s.led_intensity} ' \
-                          f'--output {new_folder_name_child}/%0{int(ceil(log10(s.timeout)))}d.jpg ' \
-                          f'--save-nfo'
-            # rec_command = "picam --help"
-            command = "nohup %s > %s/log.out 2<&1 &" % (rec_command, new_folder_name_child)
 
-            print(command)
-            stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+    def start(self, config_file, background_mode = False):
+
+        rec_command = f'picam {config_file}'
+
+        if background_mode:
+            log_folder = self.create_log_folder()
+            command = f'{rec_command}'
+        else:
+            command = rec_command
+
+        print(command)
+        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+        for line in iter(stdout.readline, ""):
+            print(line, end="")
 
     def stop(self):
         stdin, stdout, stderr = self.ssh.exec_command("pkill picam", get_pty=True)
@@ -163,3 +157,12 @@ class Device:
         stdin, stdout, stderr = self.ssh.exec_command("sudo poweroff", get_pty=True)
         del self
 
+    def create_log_folder(self):
+        log_folder = f"/home/{self.username}/log"
+        try:
+            with self.ssh.open_sftp() as sftp:
+                sftp.mkdir(log_folder)
+        except:
+            pass
+
+        return log_folder

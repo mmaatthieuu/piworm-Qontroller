@@ -3,6 +3,8 @@ import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 from . import qontroller
+import json
+import datetime as dt
 
 from .device import Device
 from .picam_settings import PicamSettings
@@ -91,7 +93,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.thread.started.connect(self.worker.do_work)
         self.thread.finished.connect(self.worker.stop)
 
-
         # When stop_btn is clicked this runs. Terminates the worker and the thread.
 
     #def on_context_menu(self, point): # not used anymore
@@ -179,8 +180,14 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def refresh_view(self):
         if self.currentDeviceID is not None:
             currentDevice = self.host_list[self.currentDeviceID]
-            s = PicamSettings(self)
-            self.full_pixmap = currentDevice.get_frame(s)
+            #s = PicamSettings(self)
+
+            config = self.generate_json_config_from_GUI_widgets(preview_mode=True)
+            file = self.save_json_config_file(config)
+
+            remote_path = currentDevice.receive_json_config_file(file)
+
+            self.full_pixmap = currentDevice.get_frame(remote_path)
             # self.labelDisplay.setPixmap(self.full_pixmap)
 
             self.display_frame_pixmap(self.full_pixmap)
@@ -197,7 +204,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     def auto_refresh(self):
         while self.do_auto_refresh:
-            print("yo")
             QtCore.QThread.sleep(1)
 
     def on_listBoxDevices_clicked(self, index):
@@ -223,6 +229,57 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     def set_pixmap_scaling(self, pxm):
         pass
+
+    def generate_json_config_from_GUI_widgets(self, preview_mode):
+        """
+        :param preview_mode: bool, if true, only one frame is captured
+        :return: dictionary containing all the GUI input
+        """
+
+        json_dict = {"verbosity_level":	0,
+                     "timeout": 		self.spinTimeout.value() * (60 ** self.comboTimeoutUnit.currentIndex()),
+                     "time_interval": 	self.spinTimeInterval.value(),
+                     "average": 		self.spinAveraging.value(),
+                     "quality": 		self.spinJpgQuality.value(),
+                     "ISO":				self.spinISO.value(),
+                     "shutter_speed":	self.spinShutterSpeed.value(),
+                     "brightness":	    self.spinBrightness.value(),
+                     "compress": 		self.spinArchiveSize.value(),
+                     "start_frame":		self.spinStartingFrame.value(),
+                     "LED_intensity":   self.spinLEDIntensity.value(),
+                     "annotate_frames": True,
+                     "use_samba":		True,
+                     "smb_service":		"//lpbsnas1.epfl.ch/LPBS",
+                     "workgroup":		None,
+                     "credentials_file": "/etc/.smbpicreds",
+                     "smb_dir": 		"Users/Matthieu-Schmidt/WORMSTATION/",
+                     "local_output_dir":  None,
+                     "output_filename":	"auto",
+                     "local_tmp_dir":    ".wormstation_tmp",
+                     "capture_timeout":	3.0}
+
+        if preview_mode:
+            json_dict["timeout"] = 0
+            json_dict["use_samba"] = False
+            json_dict["local_tmp_dir"] = json_dict["local_tmp_dir"]
+
+        #return f'"{json.dumps(json_dict)}"'
+        return json_dict
+
+    def save_json_config_file(self, json_config, filename=None):
+        """
+        :param json_config: dictionary of the configuration
+        :param filename: output filename to save the file containing the json configuration
+        :return: the output filename
+        """
+        if filename is None:
+            filename = f'wormstation_{dt.datetime.now().strftime("%Y%m%d_%H%M")}.json'
+        with open(filename, 'w') as jfile:
+            json.dump(json_config, jfile, indent=4)
+
+        return filename
+
+
 
 
     @QtCore.pyqtSlot(QtWidgets.QListWidgetItem, QtWidgets.QListWidgetItem)
@@ -274,12 +331,21 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         devices_marked_for_recording = self.get_devices_marked_for_recording()
 
+        config = self.generate_json_config_from_GUI_widgets(preview_mode=False)
+        file = self.save_json_config_file(config)
+
+
+
+
         # Check if all the devices are up-to-date.
         # If all devices are up-to-date (on_btnCheckUpdates_clicked empty, then do recording)
         if not self.on_btnCheckUpdates_clicked(devices_marked_for_recording):
             s = PicamSettings(self)
             for d in devices_marked_for_recording:
-                d.record(s)
+
+                remote_path = d.receive_json_config_file(file)
+
+                d.record(remote_path)
 
         # Else ask to do the update
         else:
@@ -290,8 +356,10 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def on_btnStopRecord_clicked(self):
+        devices_marked_for_recording = self.get_devices_marked_for_recording()
         for d in self.running_devices():
-            d.stop()
+            if d in devices_marked_for_recording:
+                d.stop()
 
     def running_devices(self):
         running_list = []

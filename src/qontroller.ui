@@ -56,8 +56,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>1975</width>
-          <height>1072</height>
+          <width>1979</width>
+          <height>1078</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -152,7 +152,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="zoom-out"/>
+               <iconset theme="zoom-out">
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -162,7 +163,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="media-playback-start"/>
+               <iconset theme="media-playback-start">
+                <normaloff>.</normaloff>.</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -187,7 +189,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="zoom-in"/>
+               <iconset theme="zoom-in">
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -197,7 +200,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="view-refresh"/>
+               <iconset theme="view-refresh">
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -223,7 +227,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="gtk-zoom-fit"/>
+               <iconset theme="gtk-zoom-fit">
+                <normaloff>.</normaloff>.</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -236,7 +241,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="zoom-draw"/>
+               <iconset theme="zoom-draw">
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -449,7 +455,11 @@
              <widget class="QComboBox" name="comboTimeoutUnit"/>
             </item>
             <item row="12" column="1">
-             <widget class="QSpinBox" name="spinStartingFrame"/>
+             <widget class="QSpinBox" name="spinStartingFrame">
+              <property name="maximum">
+               <number>1000000000</number>
+              </property>
+             </widget>
             </item>
             <item row="12" column="0">
              <widget class="QLabel" name="label_6">
@@ -511,7 +521,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="media-playback-stop"/>
+               <iconset theme="media-playback-stop">
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -521,7 +532,8 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset theme="camera-on"/>
+               <iconset theme="camera-on">
+                <normaloff>.</normaloff>.</iconset>
               </property>
              </widget>
             </item>
@@ -615,7 +627,7 @@
      <x>0</x>
      <y>0</y>
      <width>2303</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menutype_here">
