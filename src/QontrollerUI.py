@@ -186,6 +186,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             file = self.save_json_config_file(config)
 
             remote_path = currentDevice.receive_json_config_file(file)
+            os.remove(file)
 
             self.full_pixmap = currentDevice.get_frame(remote_path)
             # self.labelDisplay.setPixmap(self.full_pixmap)
@@ -350,6 +351,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         # Else ask to do the update
         else:
             self.showdialogWarning(main_text="Some devices are out of date. Please update them before recording.")
+
+        os.remove(file)
 
 
 

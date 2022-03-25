@@ -139,7 +139,7 @@ class Device:
 
         if background_mode:
             log_folder = self.create_log_folder()
-            command = f'{rec_command}'
+            command = f'nohup {rec_command}'
         else:
             command = rec_command
 
