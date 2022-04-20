@@ -88,11 +88,11 @@ class Device:
         return remote_path
 
 
-    def get_frame(self,settings):
+    def get_frame(self,settings_remote_path):
         if self.is_running:
             return self.import_last_frame_from_device()
         else:
-            return self.acquire_new_frame(settings)
+            return self.acquire_new_frame(settings_remote_path)
 
     def read_remote_frame(self, filename):
         sftp = self.ssh.open_sftp()
@@ -129,11 +129,9 @@ class Device:
         else:
             #print(s)
             print("\n\n\n")
-            self.start(config_file, background_mode=True)
+            self.start(config_file, background_mode=False)
 
-
-
-    def start(self, config_file, background_mode = False):
+    def start(self, config_file, background_mode=False):
 
         rec_command = f'picam {config_file}'
 

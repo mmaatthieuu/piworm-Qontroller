@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2303</width>
-    <height>1142</height>
+    <width>2451</width>
+    <height>1448</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,8 +56,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>1979</width>
-          <height>1078</height>
+          <width>2127</width>
+          <height>1384</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -76,7 +76,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap>blank.jpg</pixmap>
+            <pixmap>../../.designer/backup/blank.jpg</pixmap>
            </property>
            <property name="scaledContents">
             <bool>false</bool>
@@ -153,7 +153,7 @@
               </property>
               <property name="icon">
                <iconset theme="zoom-out">
-                <normaloff>.</normaloff>.</iconset>
+                <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
               </property>
              </widget>
             </item>
@@ -164,7 +164,7 @@
               </property>
               <property name="icon">
                <iconset theme="media-playback-start">
-                <normaloff>.</normaloff>.</iconset>
+                <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -190,7 +190,7 @@
               </property>
               <property name="icon">
                <iconset theme="zoom-in">
-                <normaloff>.</normaloff>.</iconset>
+                <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
               </property>
              </widget>
             </item>
@@ -201,7 +201,7 @@
               </property>
               <property name="icon">
                <iconset theme="view-refresh">
-                <normaloff>.</normaloff>.</iconset>
+                <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
               </property>
              </widget>
             </item>
@@ -228,7 +228,7 @@
               </property>
               <property name="icon">
                <iconset theme="gtk-zoom-fit">
-                <normaloff>.</normaloff>.</iconset>
+                <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -242,7 +242,7 @@
               </property>
               <property name="icon">
                <iconset theme="zoom-draw">
-                <normaloff>.</normaloff>.</iconset>
+                <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
               </property>
              </widget>
             </item>
@@ -318,7 +318,7 @@
             <item row="2" column="1">
              <widget class="QSpinBox" name="spinAveraging">
               <property name="value">
-               <number>4</number>
+               <number>1</number>
               </property>
              </widget>
             </item>
@@ -365,7 +365,7 @@
                <number>1000000</number>
               </property>
               <property name="value">
-               <number>300000</number>
+               <number>0</number>
               </property>
              </widget>
             </item>
@@ -385,7 +385,7 @@
             <item row="4" column="1">
              <widget class="QSpinBox" name="spinJpgQuality">
               <property name="value">
-               <number>90</number>
+               <number>95</number>
               </property>
              </widget>
             </item>
@@ -423,7 +423,7 @@
                <double>0.500000000000000</double>
               </property>
               <property name="value">
-               <double>2.500000000000000</double>
+               <double>2.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -511,6 +511,34 @@
               </property>
              </widget>
             </item>
+            <item row="14" column="0">
+             <widget class="QLabel" name="label_13">
+              <property name="text">
+               <string>Verbosity level</string>
+              </property>
+             </widget>
+            </item>
+            <item row="14" column="1">
+             <widget class="QSpinBox" name="spinBoxVerbosity">
+              <property name="maximum">
+               <number>2</number>
+              </property>
+             </widget>
+            </item>
+            <item row="15" column="0">
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>Log output</string>
+              </property>
+             </widget>
+            </item>
+            <item row="15" column="1">
+             <widget class="QCheckBox" name="checkBoxLog">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -522,7 +550,7 @@
               </property>
               <property name="icon">
                <iconset theme="media-playback-stop">
-                <normaloff>.</normaloff>.</iconset>
+                <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
               </property>
              </widget>
             </item>
@@ -533,7 +561,7 @@
               </property>
               <property name="icon">
                <iconset theme="camera-on">
-                <normaloff>.</normaloff>.</iconset>
+                <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
               </property>
              </widget>
             </item>
@@ -626,7 +654,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2303</width>
+     <width>2451</width>
      <height>22</height>
     </rect>
    </property>

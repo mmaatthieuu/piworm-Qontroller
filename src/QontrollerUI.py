@@ -179,8 +179,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     def refresh_view(self):
         if self.currentDeviceID is not None:
+            # get the device currently selected
             currentDevice = self.host_list[self.currentDeviceID]
-            #s = PicamSettings(self)
 
             config = self.generate_json_config_from_GUI_widgets(preview_mode=True)
             file = self.save_json_config_file(config)
@@ -237,7 +237,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         :return: dictionary containing all the GUI input
         """
 
-        json_dict = {"verbosity_level":	0,
+        json_dict = {"verbosity_level":	self.spinBoxVerbosity.value(),
                      "timeout": 		self.spinTimeout.value() * (60 ** self.comboTimeoutUnit.currentIndex()),
                      "time_interval": 	self.spinTimeInterval.value(),
                      "average": 		self.spinAveraging.value(),
@@ -257,12 +257,12 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "local_output_dir":  None,
                      "output_filename":	"auto",
                      "local_tmp_dir":    ".wormstation_tmp",
-                     "capture_timeout":	3.0}
+                     "capture_timeout":	5.0}
 
         if preview_mode:
             json_dict["timeout"] = 0
             json_dict["use_samba"] = False
-            json_dict["local_tmp_dir"] = json_dict["local_tmp_dir"]
+            #json_dict["local_tmp_dir"] = json_dict["local_tmp_dir"]
 
         #return f'"{json.dumps(json_dict)}"'
         return json_dict
@@ -335,13 +335,10 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         config = self.generate_json_config_from_GUI_widgets(preview_mode=False)
         file = self.save_json_config_file(config)
 
-
-
-
         # Check if all the devices are up-to-date.
         # If all devices are up-to-date (on_btnCheckUpdates_clicked empty, then do recording)
         if not self.on_btnCheckUpdates_clicked(devices_marked_for_recording):
-            s = PicamSettings(self)
+            #s = PicamSettings(self)
             for d in devices_marked_for_recording:
 
                 remote_path = d.receive_json_config_file(file)
