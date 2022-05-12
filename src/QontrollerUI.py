@@ -6,8 +6,20 @@ from . import qontroller
 import json
 import datetime as dt
 
+#from multiprocessing import Pool
+from multiprocessing.pool import ThreadPool
+from itertools import compress
+
 from .device import Device
 from .picam_settings import PicamSettings
+
+
+def get_device_updatable_status(device):
+    return not device.is_uptodate
+
+
+def update_device(device):
+    device.update()
 
 
 class Worker(QtCore.QObject):
@@ -303,17 +315,23 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         if device_list is None:
             device_list = self.host_list
 
-        updatable_devices = []
-        for d in device_list:
-            if not d.is_uptodate:
-                updatable_devices.append(d)
+        with ThreadPool(12) as p:
+            updatable_devices_status = p.map(get_device_updatable_status, device_list)
+
+        updatable_devices = compress(device_list, updatable_devices_status)
 
         return updatable_devices
 
+
     @QtCore.pyqtSlot()
     def on_btnUpdateAll_clicked(self):
-        for d in self.on_btnCheckUpdates_clicked():
-            d.update()
+        devices_to_update =  self.on_btnCheckUpdates_clicked()
+
+        print(devices_to_update)
+
+        with ThreadPool(12) as p:
+            p.map(update_device, devices_to_update)
+
 
     def showdialogWarning(self, main_text, additional_text=None):
         msg = QtWidgets.QMessageBox()
