@@ -129,7 +129,7 @@ class Device:
         else:
             #print(s)
             print("\n\n\n")
-            self.start(config_file, background_mode=False)
+            self.start(config_file, background_mode=True)
 
     def start(self, config_file, background_mode=False):
 

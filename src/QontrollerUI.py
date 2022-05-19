@@ -327,8 +327,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def on_btnUpdateAll_clicked(self):
         devices_to_update =  self.on_btnCheckUpdates_clicked()
 
-        print(devices_to_update)
-
         with ThreadPool(12) as p:
             p.map(update_device, devices_to_update)
 
@@ -355,7 +353,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         # Check if all the devices are up-to-date.
         # If all devices are up-to-date (on_btnCheckUpdates_clicked empty, then do recording)
-        if not self.on_btnCheckUpdates_clicked(devices_marked_for_recording):
+        if self.on_btnCheckUpdates_clicked(devices_marked_for_recording):
             #s = PicamSettings(self)
             for d in devices_marked_for_recording:
 
