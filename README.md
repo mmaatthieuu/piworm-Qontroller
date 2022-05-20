@@ -1,2 +1,2 @@
-# piworm-Qontroller
-Remote controller in Qt for Piworm
+# Wormstation Controller
+Remote controller in Qt for the Wormstation client
