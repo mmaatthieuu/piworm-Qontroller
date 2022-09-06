@@ -6,5 +6,5 @@ piworm05.epfl.ch
 piworm06.epfl.ch
 piworm07.epfl.ch
 piworm08.epfl.ch
-piworm09.epfl.ch
-piworm10.epfl.ch
+#piworm09.epfl.ch
+#piworm10.epfl.ch

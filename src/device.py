@@ -155,6 +155,11 @@ class Device:
         stdin, stdout, stderr = self.ssh.exec_command("sudo poweroff", get_pty=True)
         del self
 
+    def reboot(self):
+        print("Rebooting %s" % self.name)
+        stdin, stdout, stderr = self.ssh.exec_command("sudo reboot", get_pty=True)
+        del self
+
     def create_log_folder(self):
         log_folder = f"/home/{self.username}/log"
         try:

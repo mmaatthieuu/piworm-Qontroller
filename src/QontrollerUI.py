@@ -5,6 +5,7 @@ import os
 from . import qontroller
 import json
 import datetime as dt
+import time
 
 #from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
@@ -243,6 +244,9 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def set_pixmap_scaling(self, pxm):
         pass
 
+    def get_timeout(self):
+        return self.spinTimeout.value() * (60 ** self.comboTimeoutUnit.currentIndex())
+
     def generate_json_config_from_GUI_widgets(self, preview_mode):
         """
         :param preview_mode: bool, if true, only one frame is captured
@@ -250,7 +254,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         """
 
         json_dict = {"verbosity_level":	self.spinBoxVerbosity.value(),
-                     "timeout": 		self.spinTimeout.value() * (60 ** self.comboTimeoutUnit.currentIndex()),
+                     "timeout": 		self.get_timeout(),
                      "time_interval": 	self.spinTimeInterval.value(),
                      "average": 		self.spinAveraging.value(),
                      "quality": 		self.spinJpgQuality.value(),
@@ -368,6 +372,13 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         os.remove(file)
 
 
+    def start_timer(self):
+        timeout = self.get_timeout()
+        start_time = time.time()
+
+        """
+        while some device are running, write theri remaining time next to their name
+        """
 
 
     @QtCore.pyqtSlot()
@@ -428,6 +439,11 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def on_btnShutdown_clicked(self):
         for d in self.host_list:
             d.shutdown()
+
+    @QtCore.pyqtSlot()
+    def on_btnReboot_clicked(self):
+        for d in self.host_list:
+            d.reboot()
 
     ### TAB 2
 
