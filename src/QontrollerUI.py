@@ -273,7 +273,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "local_output_dir":  None,
                      "output_filename":	"auto",
                      "local_tmp_dir":    ".wormstation_tmp",
-                     "capture_timeout":	5.0}
+                     "capture_timeout":	5.0,
+                     "recording_name":  self.textRecordName.toPlainText()}
 
         if preview_mode:
             json_dict["timeout"] = 0
