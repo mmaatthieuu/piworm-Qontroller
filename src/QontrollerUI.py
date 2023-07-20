@@ -78,6 +78,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.listBoxDevices.currentItemChanged.connect(self.current_item_changed)
         self.sliderZoom.valueChanged.connect(self.zoom)
 
+        self.slider_switch_led.valueChanged.connect(self.switch_led)
 
         self.listBoxDevices.installEventFilter(self)
 
@@ -206,15 +207,18 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
             self.display_frame_pixmap(self.full_pixmap)
 
+            self.switch_led()
+
         else:
             print("Please first select a device")
 
     def display_frame_pixmap(self, pxm):
-        if self.fit_view_status:
-            self.labelDisplay.setPixmap(pxm.scaled(self.scrollArea.size(), QtCore.Qt.KeepAspectRatio))
-        else:
-            self.labelDisplay.setPixmap(pxm.scaled(self.full_pixmap.size() * self.sliderZoom.value() / 100,
-                                                                QtCore.Qt.KeepAspectRatio))
+        if pxm is not None:
+            if self.fit_view_status:
+                self.labelDisplay.setPixmap(pxm.scaled(self.scrollArea.size(), QtCore.Qt.KeepAspectRatio))
+            else:
+                self.labelDisplay.setPixmap(pxm.scaled(self.full_pixmap.size() * self.sliderZoom.value() / 100,
+                                                                    QtCore.Qt.KeepAspectRatio))
 
     def auto_refresh(self):
         while self.do_auto_refresh:
@@ -245,6 +249,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         pass
 
     def get_timeout(self):
+        # Return timeout in seconds
         return self.spinTimeout.value() * (60 ** self.comboTimeoutUnit.currentIndex())
 
     def generate_json_config_from_GUI_widgets(self, preview_mode):
@@ -256,7 +261,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         json_dict = {"verbosity_level":	self.spinBoxVerbosity.value(),
                      "timeout": 		self.get_timeout(),
                      "time_interval": 	self.spinTimeInterval.value(),
-                     "average": 		self.spinAveraging.value(),
                      "quality": 		self.spinJpgQuality.value(),
                      "ISO":				self.spinISO.value(),
                      "shutter_speed":	self.spinShutterSpeed.value(),
@@ -264,6 +268,9 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "compress": 		self.spinArchiveSize.value(),
                      "start_frame":		self.spinStartingFrame.value(),
                      "LED_intensity":   self.spinLEDIntensity.value(),
+                     "optogenetic":     self.checkBoxOptogen.isChecked(),
+                     "pulse_duration":  self.spinPulseDuration.value(),
+                     "pulse_interval":  self.spinPulseInterval.value(),
                      "annotate_frames": True,
                      "use_samba":		True,
                      "smb_service":		"//lpbsnas1.epfl.ch/LPBS",
@@ -388,6 +395,22 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         for d in self.running_devices():
             if d in devices_marked_for_recording:
                 d.stop()
+
+    def turn_on_leds(self):
+        devices_marked_for_recording = self.get_devices_marked_for_recording()
+        for d in devices_marked_for_recording:
+            d.turn_on_led()
+
+    def turn_off_leds(self):
+        devices_marked_for_recording = self.get_devices_marked_for_recording()
+        for d in devices_marked_for_recording:
+            d.turn_off_led()
+
+    def switch_led(self):
+        if self.slider_switch_led.value() == 0:
+            self.turn_off_leds()
+        else:
+            self.turn_on_leds()
 
     def running_devices(self):
         running_list = []

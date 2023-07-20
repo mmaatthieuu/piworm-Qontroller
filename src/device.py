@@ -107,8 +107,12 @@ class Device:
         return new_pixmap
 
     def import_last_frame_from_device(self):
-        print("Device is running : getting last frame")
-        return self.read_remote_frame("/home/matthieu/tmp/last_frame.jpg")
+        try:
+            print("Device is running : getting last frame")
+            return self.read_remote_frame("/home/matthieu/tmp/last_frame.jpg")
+        except FileNotFoundError:
+            print("No frame ready")
+            return None
 
     def acquire_new_frame(self, config_file):
         self.start(config_file, background_mode=False)
@@ -142,9 +146,15 @@ class Device:
             command = rec_command
 
         print(command)
-        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
-        for line in iter(stdout.readline, ""):
-            print(line, end="")
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+            for line in iter(stdout.readline, ""):
+                print(line, end="")
+
+        except paramiko.ssh_exception.SSHException as e:
+            print(e)
+            print(f"Connection with device {self.name} lost")
+
 
     def stop(self):
         stdin, stdout, stderr = self.ssh.exec_command("pkill picam", get_pty=True)
@@ -159,6 +169,12 @@ class Device:
         print("Rebooting %s" % self.name)
         stdin, stdout, stderr = self.ssh.exec_command("sudo reboot", get_pty=True)
         del self
+
+    def turn_on_led(self):
+        stdin, stdout, stderr = self.ssh.exec_command("python ~/piworm/src/led_control/turn_on_led.py", get_pty=True)
+
+    def turn_off_led(self):
+        stdin, stdout, stderr = self.ssh.exec_command("python ~/piworm/src/led_control/turn_off_led.py", get_pty=True)
 
     def create_log_folder(self):
         log_folder = f"/home/{self.username}/log"
