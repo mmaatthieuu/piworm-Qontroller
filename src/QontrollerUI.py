@@ -268,6 +268,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "compress": 		self.spinArchiveSize.value(),
                      "start_frame":		self.spinStartingFrame.value(),
                      "LED_intensity":   self.spinLEDIntensity.value(),
+                     "illumination_pulse":  self.spinIlluminationPulse.value(),
                      "optogenetic":     self.checkBoxOptogen.isChecked(),
                      "pulse_duration":  self.spinPulseDuration.value(),
                      "pulse_interval":  self.spinPulseInterval.value(),
