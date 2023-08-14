@@ -11,7 +11,7 @@ piworm09.epfl.ch
 piworm10.epfl.ch
 piworm11.epfl.ch
 piworm12.epfl.ch
-#piworm13.epfl.ch
-#piworm14.epfl.ch
-#piworm15.epfl.ch
-#piworm16.epfl.ch
+piworm13.epfl.ch
+piworm14.epfl.ch
+piworm15.epfl.ch
+piworm16.epfl.ch
