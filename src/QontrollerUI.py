@@ -1,5 +1,6 @@
 import time
 
+import paramiko.ssh_exception
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 from . import qontroller
@@ -179,6 +180,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def scan_devices(self):
         self.listBoxDevices.clear()
         self.host_list = []
+
         with open("hosts_list.txt", 'r') as hosts_list:
             for host in hosts_list.read().splitlines():
                 # device = "piworm%02d.epfl.ch" % i
@@ -192,25 +194,28 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                             self.add_device(host)
 
     def refresh_view(self):
-        if self.currentDeviceID is not None:
-            # get the device currently selected
-            currentDevice = self.host_list[self.currentDeviceID]
+        try:
+            if self.currentDeviceID is not None:
+                # get the device currently selected
+                currentDevice = self.host_list[self.currentDeviceID]
 
-            config = self.generate_json_config_from_GUI_widgets(preview_mode=True)
-            file = self.save_json_config_file(config)
+                config = self.generate_json_config_from_GUI_widgets(preview_mode=True)
+                file = self.save_json_config_file(config)
 
-            remote_path = currentDevice.receive_json_config_file(file)
-            os.remove(file)
+                remote_path = currentDevice.receive_json_config_file(file)
+                os.remove(file)
 
-            self.full_pixmap = currentDevice.get_frame(remote_path)
-            # self.labelDisplay.setPixmap(self.full_pixmap)
+                self.full_pixmap = currentDevice.get_frame(remote_path)
+                # self.labelDisplay.setPixmap(self.full_pixmap)
 
-            self.display_frame_pixmap(self.full_pixmap)
+                self.display_frame_pixmap(self.full_pixmap)
 
-            self.switch_led()
+                self.switch_led()
 
-        else:
-            print("Please first select a device")
+            else:
+                print("Please first select a device")
+        except paramiko.ssh_exception.SSHException:
+            print("Connection with devices lost, please rescan for devices")
 
     def display_frame_pixmap(self, pxm):
         if pxm is not None:
@@ -236,6 +241,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                 devices_marked_for_recording.append(self.host_list[i])
 
         return devices_marked_for_recording
+
 
     def zoom(self):
         self.labelDisplay.setPixmap(self.full_pixmap.scaled(self.full_pixmap.size()*self.sliderZoom.value()/100, QtCore.Qt.KeepAspectRatio))
