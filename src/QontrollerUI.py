@@ -48,6 +48,9 @@ class ContextmenuDevice(QtWidgets.QMenu):
         test_action = QtWidgets.QAction("print yo", triggered=self.test_function)
         self.addAction(test_action)
 
+    def test_function(self):
+        print("hello")
+
 class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     stop_signal = QtCore.pyqtSignal()
 
@@ -82,6 +85,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.slider_switch_led.valueChanged.connect(self.switch_led)
 
         self.listBoxDevices.installEventFilter(self)
+
+        self.btnStopRecord.clicked.connect(self.uncheck_live_view)
 
         # create context menu - not used anymore
         self.popMenu = QtWidgets.QMenu(self)
@@ -131,8 +136,9 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def eventFilter(self, source, event):
         if (event.type() == QtCore.QEvent.ContextMenu and
                 source is self.listBoxDevices):
+            print("ok")
             menu = ContextmenuDevice()
-            if menu.exec_(event.globalPos()):
+            if menu.exec_(menu.mapToGlobal(event.pos())):
                 item = source.itemAt(event.pos())
 
             # je pense que c'est plus simple comme en dessous
@@ -145,6 +151,16 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             """
             return True
         return super(QontrollerUI, self).eventFilter(source, event)
+
+
+    def contextMenuEvent(self, event):
+        contextMenu = QtWidgets.QMenu(self)
+        newAct = contextMenu.addAction("New")
+        openAct = contextMenu.addAction("Open")
+        quitAct = contextMenu.addAction("Quit")
+        action = contextMenu.exec_(self.mapToGlobal(event.pos()))
+        if action == quitAct:
+            self.close()
 
     def add_device(self, name):
         id = self.listBoxDevices.count()
@@ -215,6 +231,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             else:
                 print("Please first select a device")
         except paramiko.ssh_exception.SSHException:
+            print("Connection with devices lost, please rescan for devices")
+        except ConnectionResetError:
             print("Connection with devices lost, please rescan for devices")
 
     def display_frame_pixmap(self, pxm):
@@ -398,6 +416,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def on_btnStopRecord_clicked(self):
+        self.on_btnLiveView_clicked(False)
         devices_marked_for_recording = self.get_devices_marked_for_recording()
         for d in self.running_devices():
             if d in devices_marked_for_recording:
@@ -465,6 +484,16 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             self.thread.start()
         else:
             self.stop_thread()
+
+    @QtCore.pyqtSlot()
+    def uncheck_live_view(self):
+        if self.btnLiveView.isChecked():
+            self.btnLiveView.setChecked(False)
+
+    @QtCore.pyqtSlot()
+    def on_btnClearTmpFolder_clicked(self):
+        for d in self.host_list:
+            d.clear_tmp_folder()
 
     @QtCore.pyqtSlot()
     def on_btnShutdown_clicked(self):

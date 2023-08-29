@@ -524,19 +524,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="1">
-                 <widget class="QDoubleSpinBox" name="spinTimeInterval">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.500000000000000</double>
-                  </property>
-                  <property name="value">
-                   <double>2.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
                 <item row="10" column="0">
                  <widget class="QLabel" name="label_9">
                   <property name="text">
@@ -563,6 +550,9 @@
                 </item>
                 <item row="11" column="1">
                  <widget class="QSpinBox" name="spinStartingFrame">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="maximum">
                    <number>1000000000</number>
                   </property>
@@ -817,6 +807,16 @@
                   </property>
                  </widget>
                 </item>
+                <item row="9" column="1">
+                 <widget class="QSpinBox" name="spinTimeInterval">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="value">
+                   <number>2</number>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </item>
               <item>
@@ -994,6 +994,13 @@
                <widget class="QPushButton" name="btnUpdateAll">
                 <property name="text">
                  <string>Update All</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnClearTmpFolder">
+                <property name="text">
+                 <string>Clear Tmp Folder</string>
                 </property>
                </widget>
               </item>
