@@ -1070,6 +1070,7 @@
     <property name="title">
      <string>View</string>
     </property>
+    <addaction name="actionMosaic"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1095,6 +1096,11 @@
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
+   </property>
+  </action>
+  <action name="actionMosaic">
+   <property name="text">
+    <string>Mosaic</string>
    </property>
   </action>
  </widget>

@@ -15,6 +15,8 @@ from itertools import compress
 from .device import Device
 from .picam_settings import PicamSettings
 
+from .device_manager import DeviceManager
+
 
 def get_device_updatable_status(device):
     return not device.is_uptodate
@@ -73,6 +75,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.do_auto_refresh = self.btnLiveView.isChecked()
 
         self.comboTimeoutUnit.addItems(["Seconds", "Minutes", "Hours"])
+
+        self.dm = DeviceManager()
 
         # Signals
 
@@ -165,17 +169,20 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def add_device(self, name):
         id = self.listBoxDevices.count()
         new_device = Device(name, id=id)
-        new_item = QtWidgets.QListWidgetItem(name)
 
-        #item = QtWidgets.QListWidgetItem(testcase_name)
-        new_item.setFlags(new_item.flags() | QtCore.Qt.ItemIsUserCheckable)
-        new_item.setCheckState(QtCore.Qt.Checked)
-        #self.listWidgetTestCases.addItem(item)
+        if new_device.connected:
 
-        ch = QtWidgets.QCheckBox()
-        #new_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-        self.listBoxDevices.addItem(new_item)
-        self.host_list.append(new_device)
+            new_item = QtWidgets.QListWidgetItem(name)
+
+            #item = QtWidgets.QListWidgetItem(testcase_name)
+            new_item.setFlags(new_item.flags() | QtCore.Qt.ItemIsUserCheckable)
+            new_item.setCheckState(QtCore.Qt.Checked)
+            #self.listWidgetTestCases.addItem(item)
+
+            ch = QtWidgets.QCheckBox()
+            #new_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+            self.listBoxDevices.addItem(new_item)
+            self.host_list.append(new_device)
 
     def right_menu_device(self, pos):
         menu = QMenu(self.listBoxDevices)

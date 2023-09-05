@@ -19,7 +19,9 @@ class Device:
         
         self.username = "matthieu"
 
+        self.connected = False
         self.ssh_connect()
+
 
 
 
@@ -57,14 +59,14 @@ class Device:
             print("Device %s updated" % self.name)
 
     def ssh_connect(self):
-        connected = False
+        self.connected = False
         i = 0
-        while (not connected and i < 3):
+        while (not self.connected and i < 3):
             try:
                 self.ssh.load_system_host_keys()
                 self.ssh.connect(self.name, port=22, username=self.username, timeout=3)
                 self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                connected = True
+                self.connected = True
             except paramiko.ssh_exception.SSHException as e:
                 print(e)
                 if os.name == 'nt':
@@ -72,6 +74,14 @@ class Device:
                 else:
                     os.system(f"ssh-copy-id {self.username}@{self.name}")
                 i += 1
+            except paramiko.ssh_exception.NoValidConnectionsError as e:
+                print(e)
+                print(f'Device {self.name} is unreachable.')
+
+                i += 1
+
+            finally:
+                return self.connected
 
     def receive_json_config_file(self, file):
         with self.ssh.open_sftp() as sftp:
