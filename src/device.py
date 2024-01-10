@@ -17,7 +17,7 @@ class Device:
 
         self.ssh = paramiko.SSHClient()
         
-        self.username = "matthieu"
+        self.username = "scientist"
 
         self.connected = False
         self.ssh_connect()
@@ -38,7 +38,7 @@ class Device:
 
     @property
     def is_uptodate(self):
-        stdin, stdout, stderr = self.ssh.exec_command("cd /home/matthieu/piworm && git fetch --dry-run", get_pty=True)
+        stdin, stdout, stderr = self.ssh.exec_command(f"cd /home/{self.username}/piworm && git fetch --dry-run", get_pty=True)
         if stdout.readline() == '':
             print(self.name + " up to date")
             return True
@@ -53,7 +53,7 @@ class Device:
             ## hard pull
             # stdin, stdout, stderr = self.ssh.exec_command(
             #    "cd /home/matthieu/piworm && git reset --hard origin/main && git pull", get_pty=True)
-            stdin, stdout, stderr = self.ssh.exec_command("cd /home/matthieu/piworm && git pull", get_pty=True)
+            stdin, stdout, stderr = self.ssh.exec_command(f"cd /home/{self.username}/piworm && git pull", get_pty=True)
             for line in iter(stdout.readline, ""):
                 print(line, end="")
             print("Device %s updated" % self.name)
@@ -119,7 +119,7 @@ class Device:
     def import_last_frame_from_device(self):
         try:
             print("Device is running : getting last frame")
-            return self.read_remote_frame("/home/matthieu/tmp/last_frame.jpg")
+            return self.read_remote_frame(f"/home/{self.username}/tmp/last_frame.jpg")
         except FileNotFoundError:
             print("No frame ready")
             return None
@@ -133,7 +133,7 @@ class Device:
         for line in iter(stdout.readline, ""):
             print(line, end="")
         """
-        return self.read_remote_frame("/home/matthieu/tmp/last_frame.jpg")
+        return self.read_remote_frame(f"/home/{self.username}/tmp/last_frame.jpg")
 
     def record(self, config_file):
 
@@ -197,5 +197,5 @@ class Device:
         return log_folder
 
     def clear_tmp_folder(self):
-        print(f'Clear folder /home/matthieu/.wormstation_tmp/ on {self.name}')
-        stdin, stdout, stderr = self.ssh.exec_command("rm -rf /home/matthieu/.wormstation_tmp/*", get_pty=True)
+        print(f'Clear folder /home/{self.username}/.wormstation_tmp/ on {self.name}')
+        stdin, stdout, stderr = self.ssh.exec_command(f"rm -rf /home/{self.username}/.wormstation_tmp/*", get_pty=True)
