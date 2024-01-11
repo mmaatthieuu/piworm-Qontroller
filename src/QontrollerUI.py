@@ -7,6 +7,7 @@ from . import qontroller
 import json
 import datetime as dt
 import time
+import subprocess
 
 #from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
@@ -207,14 +208,21 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         with open("hosts_list.txt", 'r') as hosts_list:
             for host in hosts_list.read().splitlines():
                 # device = "piworm%02d.epfl.ch" % i
-                # Check if device name is marked as comment
-                if host[0] != '#':
-                    if os.name == 'nt':
-                        if os.system("ping -n 1 -w 300 " + host) == 0:
-                            self.add_device(host)
-                    else:
-                        if os.system("ping -c 1 -q -W 0.3 " + host) == 0:
-                            self.add_device(host)
+                # Check if device name is marked as a comment
+                if host and host[0] != '#':
+                    # Check if device is reachable
+                    try:
+                        if os.name == 'nt':
+                            subprocess.run(["ping", "-n", "1", "-w", "50", host], check=True, stdout=subprocess.PIPE,
+                                           stderr=subprocess.PIPE)
+                        else:
+                            subprocess.run(["ping", "-c", "1", "-q", "-W", "0.05", host], check=True,
+                                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+                        self.add_device(host)
+                    except subprocess.CalledProcessError:
+                        # Ping failed (timeout or non-zero return code)
+                        pass
 
     def refresh_view(self):
         try:
