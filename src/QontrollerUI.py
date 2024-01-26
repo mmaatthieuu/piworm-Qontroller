@@ -312,7 +312,10 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "pulse_duration":  self.spinPulseDuration.value(),
                      "pulse_interval":  self.spinPulseInterval.value(),
                      "annotate_frames": True,
-                     "use_samba":		True,
+                     "use_samba":		False,
+                     "use_ssh":			True,
+                     "ssh_destination": "128.178.66.169",
+                     "ssh_dir":         "/media/scientist/SanDisk",
                      "smb_service":		"//lpbsnas1.epfl.ch/LPBS2",
                      "workgroup":		None,
                      "credentials_file": "/etc/.smbpicreds",
@@ -321,7 +324,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "output_filename":	"auto",
                      "local_tmp_dir":    ".wormstation_tmp",
                      "capture_timeout":	5.0,
-                     "recording_name":  self.textRecordName.toPlainText()}
+                     "recording_name":  self.textRecordName.toPlainText(),
+                     "compute_chemotaxis": True}
 
         if preview_mode:
             json_dict["timeout"] = 0
