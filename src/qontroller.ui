@@ -148,76 +148,11 @@
                <enum>QLayout::SetMaximumSize</enum>
               </property>
               <item>
-               <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0,0,0,0">
+               <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0,0,0">
                 <property name="sizeConstraint">
                  <enum>QLayout::SetFixedSize</enum>
                 </property>
-                <item row="0" column="1">
-                 <widget class="QPushButton" name="pushButton">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>1</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>1000</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Zoom out</string>
-                  </property>
-                  <property name="icon">
-                   <iconset theme="zoom-out">
-                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QPushButton" name="btnRefresh">
-                  <property name="text">
-                   <string>Refresh</string>
-                  </property>
-                  <property name="icon">
-                   <iconset theme="view-refresh">
-                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="1">
-                 <widget class="QPushButton" name="btnOriginalView">
-                  <property name="text">
-                   <string>Reset</string>
-                  </property>
-                  <property name="icon">
-                   <iconset theme="zoom-draw">
-                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QPushButton" name="btnLiveView">
-                  <property name="text">
-                   <string>Live</string>
-                  </property>
-                  <property name="icon">
-                   <iconset theme="media-playback-start">
-                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
-                  </property>
-                  <property name="checkable">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0" colspan="2">
+                <item row="3" column="0" colspan="2">
                  <widget class="QLabel" name="label_15">
                   <property name="font">
                    <font>
@@ -234,57 +169,18 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="0">
-                 <widget class="QPushButton" name="pushButton_2">
-                  <property name="enabled">
-                   <bool>true</bool>
-                  </property>
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>1</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>1000</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
+                <item row="4" column="0">
+                 <widget class="QPushButton" name="btnRefresh">
                   <property name="text">
-                   <string>Zoom in</string>
+                   <string>Refresh</string>
                   </property>
                   <property name="icon">
-                   <iconset theme="zoom-in">
+                   <iconset theme="view-refresh">
                     <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_17">
-                  <property name="text">
-                   <string>LED State</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QPushButton" name="btnFitView">
-                  <property name="text">
-                   <string>Adjust</string>
-                  </property>
-                  <property name="icon">
-                   <iconset theme="gtk-zoom-fit">
-                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
-                  </property>
-                  <property name="checkable">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
+                <item row="0" column="1">
                  <layout class="QGridLayout" name="gridLayout_3">
                   <item row="0" column="0">
                    <widget class="QLabel" name="label_18">
@@ -320,6 +216,55 @@
                    </widget>
                   </item>
                  </layout>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QPushButton" name="btnOriginalView">
+                  <property name="text">
+                   <string>Reset</string>
+                  </property>
+                  <property name="icon">
+                   <iconset theme="zoom-draw">
+                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QPushButton" name="btnFitView">
+                  <property name="text">
+                   <string>Adjust</string>
+                  </property>
+                  <property name="icon">
+                   <iconset theme="gtk-zoom-fit">
+                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QPushButton" name="btnLiveView">
+                  <property name="text">
+                   <string>Live</string>
+                  </property>
+                  <property name="icon">
+                   <iconset theme="media-playback-start">
+                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_17">
+                  <property name="text">
+                   <string>LED State</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -434,6 +379,9 @@
                   <property name="maximum">
                    <number>1000000</number>
                   </property>
+                  <property name="value">
+                   <number>30000</number>
+                  </property>
                  </widget>
                 </item>
                 <item row="3" column="0">
@@ -472,7 +420,11 @@
                  </widget>
                 </item>
                 <item row="5" column="1">
-                 <widget class="QSpinBox" name="spinISO"/>
+                 <widget class="QSpinBox" name="spinISO">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item row="6" column="1">
                  <spacer name="verticalSpacer_5">
@@ -524,6 +476,16 @@
                   </property>
                  </widget>
                 </item>
+                <item row="9" column="1">
+                 <widget class="QSpinBox" name="spinTimeInterval">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="value">
+                   <number>2</number>
+                  </property>
+                 </widget>
+                </item>
                 <item row="10" column="0">
                  <widget class="QLabel" name="label_9">
                   <property name="text">
@@ -537,7 +499,7 @@
                    <number>50000</number>
                   </property>
                   <property name="value">
-                   <number>400</number>
+                   <number>3000</number>
                   </property>
                  </widget>
                 </item>
@@ -557,6 +519,39 @@
                    <number>1000000000</number>
                   </property>
                  </widget>
+                </item>
+                <item row="12" column="0">
+                 <widget class="QLabel" name="label_64">
+                  <property name="text">
+                   <string>Illumination dur.</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="12" column="1">
+                 <widget class="QSpinBox" name="spinIlluminationPulse">
+                  <property name="maximum">
+                   <number>2000</number>
+                  </property>
+                  <property name="value">
+                   <number>500</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="13" column="1">
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>5</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                 <item row="14" column="0">
                  <widget class="QLabel" name="label_20">
@@ -699,44 +694,10 @@
                   </property>
                  </widget>
                 </item>
-                <item row="17" column="1">
-                 <spacer name="verticalSpacer_6">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="18" column="0">
-                 <widget class="QLabel" name="label_13">
+                <item row="15" column="0">
+                 <widget class="QLabel" name="label_3">
                   <property name="text">
-                   <string>Verbosity level</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="18" column="1">
-                 <widget class="QSpinBox" name="spinBoxVerbosity">
-                  <property name="maximum">
-                   <number>2</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="19" column="0">
-                 <widget class="QLabel" name="label_14">
-                  <property name="text">
-                   <string>Log output</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="19" column="1">
-                 <widget class="QCheckBox" name="checkBoxLog">
-                  <property name="text">
-                   <string/>
+                   <string>Pulse  duration (s)</string>
                   </property>
                  </widget>
                 </item>
@@ -750,10 +711,10 @@
                   </property>
                  </widget>
                 </item>
-                <item row="15" column="0">
-                 <widget class="QLabel" name="label_3">
+                <item row="16" column="0">
+                 <widget class="QLabel" name="label_21">
                   <property name="text">
-                   <string>Pulse  duration (s)</string>
+                   <string>Interval (s)</string>
                   </property>
                  </widget>
                 </item>
@@ -767,15 +728,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="16" column="0">
-                 <widget class="QLabel" name="label_21">
-                  <property name="text">
-                   <string>Interval (s)</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="13" column="1">
-                 <spacer name="verticalSpacer">
+                <item row="17" column="1">
+                 <spacer name="verticalSpacer_6">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
@@ -785,35 +739,22 @@
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>20</width>
-                    <height>5</height>
+                    <height>20</height>
                    </size>
                   </property>
                  </spacer>
                 </item>
-                <item row="12" column="1">
-                 <widget class="QSpinBox" name="spinIlluminationPulse">
-                  <property name="maximum">
-                   <number>2000</number>
-                  </property>
-                  <property name="value">
-                   <number>300</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="12" column="0">
-                 <widget class="QLabel" name="label_64">
+                <item row="18" column="0">
+                 <widget class="QLabel" name="label_14">
                   <property name="text">
-                   <string>Illumination dur.</string>
+                   <string>Log output</string>
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="1">
-                 <widget class="QSpinBox" name="spinTimeInterval">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="value">
-                   <number>2</number>
+                <item row="18" column="1">
+                 <widget class="QCheckBox" name="checkBoxLog">
+                  <property name="text">
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -919,16 +860,6 @@
                  </widget>
                 </item>
                </layout>
-              </item>
-              <item>
-               <widget class="QProgressBar" name="progressBar">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="value">
-                 <number>0</number>
-                </property>
-               </widget>
               </item>
               <item>
                <spacer name="verticalSpacer_4">
