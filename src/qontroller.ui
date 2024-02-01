@@ -469,14 +469,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="0">
+                <item row="11" column="0">
                  <widget class="QLabel" name="label_8">
                   <property name="text">
                    <string>Time Interval (s)</string>
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="1">
+                <item row="11" column="1">
                  <widget class="QSpinBox" name="spinTimeInterval">
                   <property name="enabled">
                    <bool>false</bool>
@@ -486,14 +486,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="0">
+                <item row="12" column="0">
                  <widget class="QLabel" name="label_9">
                   <property name="text">
                    <string>Archives Size</string>
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="1">
+                <item row="12" column="1">
                  <widget class="QSpinBox" name="spinArchiveSize">
                   <property name="maximum">
                    <number>50000</number>
@@ -503,14 +503,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="11" column="0">
+                <item row="13" column="0">
                  <widget class="QLabel" name="label_6">
                   <property name="text">
                    <string>Starting Frame</string>
                   </property>
                  </widget>
                 </item>
-                <item row="11" column="1">
+                <item row="13" column="1">
                  <widget class="QSpinBox" name="spinStartingFrame">
                   <property name="enabled">
                    <bool>false</bool>
@@ -520,14 +520,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="12" column="0">
+                <item row="14" column="0">
                  <widget class="QLabel" name="label_64">
                   <property name="text">
                    <string>Illumination dur.</string>
                   </property>
                  </widget>
                 </item>
-                <item row="12" column="1">
+                <item row="14" column="1">
                  <widget class="QSpinBox" name="spinIlluminationPulse">
                   <property name="maximum">
                    <number>2000</number>
@@ -537,7 +537,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="1">
+                <item row="15" column="1">
                  <spacer name="verticalSpacer">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
@@ -553,7 +553,7 @@
                   </property>
                  </spacer>
                 </item>
-                <item row="14" column="0">
+                <item row="16" column="0">
                  <widget class="QLabel" name="label_20">
                   <property name="palette">
                    <palette>
@@ -684,7 +684,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="14" column="1">
+                <item row="16" column="1">
                  <widget class="QCheckBox" name="checkBoxOptogen">
                   <property name="text">
                    <string/>
@@ -694,14 +694,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="15" column="0">
+                <item row="17" column="0">
                  <widget class="QLabel" name="label_3">
                   <property name="text">
                    <string>Pulse  duration (s)</string>
                   </property>
                  </widget>
                 </item>
-                <item row="15" column="1">
+                <item row="17" column="1">
                  <widget class="QSpinBox" name="spinPulseDuration">
                   <property name="maximum">
                    <number>120</number>
@@ -711,14 +711,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="16" column="0">
+                <item row="18" column="0">
                  <widget class="QLabel" name="label_21">
                   <property name="text">
                    <string>Interval (s)</string>
                   </property>
                  </widget>
                 </item>
-                <item row="16" column="1">
+                <item row="18" column="1">
                  <widget class="QSpinBox" name="spinPulseInterval">
                   <property name="maximum">
                    <number>999999999</number>
@@ -728,7 +728,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="17" column="1">
+                <item row="19" column="1">
                  <spacer name="verticalSpacer_6">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
@@ -744,29 +744,49 @@
                   </property>
                  </spacer>
                 </item>
-                <item row="18" column="0">
+                <item row="20" column="0">
                  <widget class="QLabel" name="label_14">
                   <property name="text">
                    <string>Log output</string>
                   </property>
                  </widget>
                 </item>
-                <item row="18" column="1">
+                <item row="20" column="1">
                  <widget class="QCheckBox" name="checkBoxLog">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
-                <item row="19" column="1">
+                <item row="21" column="1">
                  <widget class="QSpinBox" name="spinBoxVerbosity"/>
                 </item>
-                <item row="19" column="0">
+                <item row="21" column="0">
                  <widget class="QLabel" name="label_13">
                   <property name="text">
                    <string>Verbosity</string>
                   </property>
                  </widget>
+                </item>
+                <item row="9" column="0">
+                 <widget class="QLabel" name="label_22">
+                  <property name="text">
+                   <string>Record for (s)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="1">
+                 <widget class="QSpinBox" name="spinBoxRecForS"/>
+                </item>
+                <item row="10" column="0">
+                 <widget class="QLabel" name="label_23">
+                  <property name="text">
+                   <string>Every (h)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="10" column="1">
+                 <widget class="QSpinBox" name="spinBoxEveryH"/>
                 </item>
                </layout>
               </item>

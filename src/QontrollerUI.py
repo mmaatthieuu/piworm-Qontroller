@@ -299,6 +299,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         json_dict = {"verbosity_level":	self.spinBoxVerbosity.value(),
                      "timeout": 		self.get_timeout(),
+                     "record_for_s":    self.spinBoxRecordForS.value(),
+                     "record_every_h":  self.spinBoxEveryH.value(),
                      "time_interval": 	self.spinTimeInterval.value(),
                      "quality": 		self.spinJpgQuality.value(),
                      "ISO":				self.spinISO.value(),
