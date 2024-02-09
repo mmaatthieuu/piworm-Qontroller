@@ -691,6 +691,20 @@
                 <item row="15" column="1">
                  <widget class="QSpinBox" name="spinBoxVerbosity"/>
                 </item>
+                <item row="16" column="0">
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>Username</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="16" column="1">
+                 <widget class="QLineEdit" name="lineEditUsername">
+                  <property name="text">
+                   <string>scientist</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </item>
               <item>

@@ -169,7 +169,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     def add_device(self, name):
         id = self.listBoxDevices.count()
-        new_device = Device(name, id=id)
+        new_device = Device(name, id=id, username=self.lineEditUsername.text())
 
         if new_device.connected:
 

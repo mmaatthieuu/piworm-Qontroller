@@ -10,14 +10,14 @@ from src.QontrollerUI import *
 
 class Device:
 
-    def __init__(self, name, id, uptodate=None):
+    def __init__(self, name, id, uptodate=None, username="scientist"):
         self.name = name
         self.id = id
         self.uptodate = uptodate
 
         self.ssh = paramiko.SSHClient()
         
-        self.username = "scientist"
+        self.username = username
 
         self.connected = False
         self.ssh_connect()
