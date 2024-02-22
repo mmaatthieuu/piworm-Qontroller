@@ -340,7 +340,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "annotate_frames": True,
                      "use_samba":		False,
                      "use_ssh":			True,
-                     "ssh_destination": "128.178.66.163",
+                     "ssh_destination": self.lineEditSshDestination.text(),
                      "ssh_dir":         "/media/scientist/SanDisk",
                      "smb_service":		"//lpbsnas1.epfl.ch/LPBS2",
                      "workgroup":		None,
