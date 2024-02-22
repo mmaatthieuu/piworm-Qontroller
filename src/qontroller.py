@@ -193,6 +193,7 @@ class Ui_MainWindow(object):
         self.label_22.setObjectName("label_22")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.label_22)
         self.spinBoxRecForS = QtWidgets.QSpinBox(self.scrollAreaWidgetContents_9)
+        self.spinBoxRecForS.setMaximum(999999)
         self.spinBoxRecForS.setObjectName("spinBoxRecForS")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.spinBoxRecForS)
         self.label_23 = QtWidgets.QLabel(self.scrollAreaWidgetContents_9)

@@ -118,11 +118,39 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.thread.started.connect(self.worker.do_work)
         self.thread.finished.connect(self.worker.stop)
 
+        # Wait for 5 second and check date
+        QtCore.QTimer.singleShot(4000, self.check_date)
+
         # When stop_btn is clicked this runs. Terminates the worker and the thread.
 
     #def on_context_menu(self, point): # not used anymore
     #    # show context menu
      #   self.popMenu.exec_(self.listBoxDevices.mapToGlobal(point))
+
+    def check_date(self):
+        # set limit date to 28.02.2024
+        limit_date = dt.datetime(2024, 3, 4).date()
+
+        self.show
+
+        # Get current date
+        current_date = dt.datetime.now().date()
+
+        if current_date > limit_date:
+
+            #Disable start button
+            self.btnRecord.setEnabled(False)
+
+            print("A new version of the software is available. Please update it.")
+            self.showdialogInfo(main_text="A new version of the software is available. Please update it.")
+
+            return False
+
+        else:
+            return True
+
+
+
     def centerandresize(self, rat=[0.75, 0.75]):
         geo = QtWidgets.QDesktopWidget().availableGeometry()
         w, h = geo.width(), geo.height()
@@ -312,7 +340,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "annotate_frames": True,
                      "use_samba":		False,
                      "use_ssh":			True,
-                     "ssh_destination": "128.178.66.169",
+                     "ssh_destination": "128.178.66.163",
                      "ssh_dir":         "/media/scientist/SanDisk",
                      "smb_service":		"//lpbsnas1.epfl.ch/LPBS2",
                      "workgroup":		None,
@@ -396,6 +424,14 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
 
         retval = msg.exec_()
+
+    def showdialogInfo(self, main_text):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setText(main_text)
+        msg.setWindowTitle("Information")
+        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        msg.exec_()
 
     @QtCore.pyqtSlot()
     def on_btnRecord_clicked(self):
