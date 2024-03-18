@@ -18,6 +18,9 @@ from .picam_settings import PicamSettings
 
 from .device_manager import DeviceManager
 
+from .dialog_windows import showdialogInfo, showdialogWarning
+from .config_wizard import ConfigWizard, load_config, save_config
+
 
 def get_device_updatable_status(device):
     return not device.is_uptodate
@@ -87,7 +90,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.listBoxDevices.currentItemChanged.connect(self.current_item_changed)
         self.sliderZoom.valueChanged.connect(self.zoom)
 
-        self.slider_switch_led.valueChanged.connect(self.switch_led)
+        self.slider_switch_led.valueChanged.connect(lambda: self.switch_led(pin=17))
+        self.slider_switch_led_OG.valueChanged.connect(lambda: self.switch_led(pin=18))
 
         self.listBoxDevices.installEventFilter(self)
 
@@ -103,6 +107,17 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         # Execute on startup
 
         self.scan_devices()
+
+        # Load or initialize configuration
+        self.config = load_config()
+        if not self.config:
+            wizard = ConfigWizard()
+            if wizard.exec_():
+                self.config = wizard.collectData() # Implement collectData to gather data from the wizard
+                save_config(self.config)
+            else:
+                # Handle cancellation or exit
+                self.close()
 
         # Thread:
 
@@ -131,7 +146,11 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         # set limit date to 28.02.2024
         limit_date = dt.datetime(2024, 3, 4).date()
 
-        self.show
+        # skip this check
+        return True
+
+        # Check if the software is up to date
+        self.show()
 
         # Get current date
         current_date = dt.datetime.now().date()
@@ -142,7 +161,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             self.btnRecord.setEnabled(False)
 
             print("A new version of the software is available. Please update it.")
-            self.showdialogInfo(main_text="A new version of the software is available. Please update it.")
+            showdialogInfo(main_text="A new version of the software is available. Please update it.")
 
             return False
 
@@ -338,8 +357,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "pulse_duration":  self.spinPulseDuration.value(),
                      "pulse_interval":  self.spinPulseInterval.value(),
                      "annotate_frames": True,
-                     "use_samba":		False,
-                     "use_ssh":			True,
+                     "use_samba":		True,
+                     "use_ssh":			False,
                      "ssh_destination": self.lineEditSshDest.text(),
                      "ssh_dir":         "/media/scientist/SanDisk",
                      "smb_service":		"//lpbsnas1.epfl.ch/LPBS2",
@@ -412,7 +431,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         with ThreadPool(12) as p:
             p.map(update_device, devices_to_update)
 
-
+    '''
     def showdialogWarning(self, main_text, additional_text=None):
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Warning)
@@ -432,6 +451,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         msg.setWindowTitle("Information")
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
+    '''
 
     @QtCore.pyqtSlot()
     def on_btnRecord_clicked(self):
@@ -453,7 +473,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         # Else ask to do the update
         else:
-            self.showdialogWarning(main_text="Some devices are out of date. Please update them before recording.")
+            showdialogWarning(main_text="Some devices are out of date. Please update them before recording.")
 
         os.remove(file)
 
@@ -475,21 +495,21 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             if d in devices_marked_for_recording:
                 d.stop()
 
-    def turn_on_leds(self):
+    def turn_on_leds(self, pin=17):
         devices_marked_for_recording = self.get_devices_marked_for_recording()
         for d in devices_marked_for_recording:
-            d.turn_on_led()
+            d.turn_on_led(pin=pin)
 
-    def turn_off_leds(self):
+    def turn_off_leds(self, pin=17):
         devices_marked_for_recording = self.get_devices_marked_for_recording()
         for d in devices_marked_for_recording:
-            d.turn_off_led()
+            d.turn_off_led(pin=pin)
 
-    def switch_led(self):
+    def switch_led(self, pin=17):
         if self.slider_switch_led.value() == 0:
-            self.turn_off_leds()
+            self.turn_off_leds(pin=pin)
         else:
-            self.turn_on_leds()
+            self.turn_on_leds(pin=pin)
 
     def running_devices(self):
         running_list = []

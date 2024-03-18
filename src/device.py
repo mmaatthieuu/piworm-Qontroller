@@ -180,11 +180,13 @@ class Device:
         stdin, stdout, stderr = self.ssh.exec_command("sudo reboot", get_pty=True)
         del self
 
-    def turn_on_led(self):
-        stdin, stdout, stderr = self.ssh.exec_command("python ~/piworm/src/led_control/turn_on_led.py", get_pty=True)
+    def turn_on_led(self, pin=17):
+        stdin, stdout, stderr = (
+            self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_on_led.py {pin}", get_pty=True))
 
-    def turn_off_led(self):
-        stdin, stdout, stderr = self.ssh.exec_command("python ~/piworm/src/led_control/turn_off_led.py", get_pty=True)
+    def turn_off_led(self, pin=17):
+        stdin, stdout, stderr = (
+            self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_off_led.py {pin}", get_pty=True))
 
     def create_log_folder(self):
         log_folder = f"/home/{self.username}/log"
