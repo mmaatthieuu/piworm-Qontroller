@@ -766,6 +766,9 @@
                   <property name="text">
                    <string/>
                   </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item row="14" column="0">

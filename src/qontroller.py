@@ -349,6 +349,7 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(18, QtWidgets.QFormLayout.LabelRole, self.destination)
         self.checkBoxComputeChemotax = QtWidgets.QCheckBox(self.scrollAreaWidgetContents_9)
         self.checkBoxComputeChemotax.setText("")
+        self.checkBoxComputeChemotax.setChecked(True)
         self.checkBoxComputeChemotax.setObjectName("checkBoxComputeChemotax")
         self.formLayout.setWidget(14, QtWidgets.QFormLayout.FieldRole, self.checkBoxComputeChemotax)
         self.label_24 = QtWidgets.QLabel(self.scrollAreaWidgetContents_9)
