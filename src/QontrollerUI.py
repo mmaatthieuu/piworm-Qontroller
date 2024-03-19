@@ -22,6 +22,10 @@ from .dialog_windows import showdialogInfo, showdialogWarning
 from .config_wizard import ConfigWizard, load_config, save_config
 
 
+IR_PIN = 17
+OG_PIN = 18
+
+
 def get_device_updatable_status(device):
     return not device.is_uptodate
 
@@ -90,8 +94,9 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.listBoxDevices.currentItemChanged.connect(self.current_item_changed)
         self.sliderZoom.valueChanged.connect(self.zoom)
 
-        self.slider_switch_led.valueChanged.connect(lambda: self.switch_led(pin=17))
-        self.slider_switch_led_OG.valueChanged.connect(lambda: self.switch_led(pin=18))
+        self.slider_switch_led.valueChanged.connect(lambda: self.switch_led_IR(pin=IR_PIN))
+        self.slider_switch_led_OG.valueChanged.connect(lambda: self.switch_led_OG(pin=OG_PIN))
+
 
         self.listBoxDevices.installEventFilter(self)
 
@@ -495,18 +500,24 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             if d in devices_marked_for_recording:
                 d.stop()
 
-    def turn_on_leds(self, pin=17):
+    def turn_on_leds(self, pin):
         devices_marked_for_recording = self.get_devices_marked_for_recording()
         for d in devices_marked_for_recording:
             d.turn_on_led(pin=pin)
 
-    def turn_off_leds(self, pin=17):
+    def turn_off_leds(self, pin):
         devices_marked_for_recording = self.get_devices_marked_for_recording()
         for d in devices_marked_for_recording:
             d.turn_off_led(pin=pin)
 
-    def switch_led(self, pin=17):
+    def switch_led_IR(self, pin=17):
         if self.slider_switch_led.value() == 0:
+            self.turn_off_leds(pin=pin)
+        else:
+            self.turn_on_leds(pin=pin)
+
+    def switch_led_OG(self, pin=18):
+        if self.slider_switch_led_OG.value() == 0:
             self.turn_off_leds(pin=pin)
         else:
             self.turn_on_leds(pin=pin)
