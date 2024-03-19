@@ -375,7 +375,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "local_tmp_dir":    ".wormstation_tmp",
                      "capture_timeout":	5.0,
                      "recording_name":  self.textRecordName.toPlainText(),
-                     "compute_chemotaxis": True}
+                     "compute_chemotaxis": self.checkBoxComputeChemotax.isChecked()}
 
         if preview_mode:
             json_dict["timeout"] = 0
