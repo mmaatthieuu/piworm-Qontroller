@@ -263,13 +263,12 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                 # Check if device name is marked as a comment
                 if host and host[0] != '#':
                     # Check if device is reachable
+                    print(f"Scanning {host}")
                     try:
                         if os.name == 'nt':
-                            subprocess.run(["ping", "-n", "1", "-w", "50", host], check=True, stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE)
+                            subprocess.run(["ping", "-n", "1", "-w", "50", host], check=True)
                         else:
-                            subprocess.run(["ping", "-c", "1", "-q", "-W", "0.05", host], check=True,
-                                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            subprocess.run(["ping", "-c", "1", "-q", "-W", "0.05", host], check=True)
 
                         self.add_device(host)
                     except subprocess.CalledProcessError:
@@ -293,7 +292,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
                 self.display_frame_pixmap(self.full_pixmap)
 
-                self.switch_led()
+                self.switch_led_IR()
+                self.switch_led_OG()
 
             else:
                 print("Please first select a device")
