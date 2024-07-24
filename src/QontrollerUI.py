@@ -367,6 +367,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "ssh_destination": self.lineEditSshDest.text(),
                      "ssh_dir":         "/media/scientist/SanDisk",
                      "smb_service":		"//lpbsnas1.epfl.ch/LPBS2",
+                     "nas_server":		"//lpbsnas1.epfl.ch",
+                     "share_name":		"LPBS2",
                      "workgroup":		None,
                      "credentials_file": "/etc/.smbpicreds",
                      "smb_dir": 		"Misc/Matthieu-Schmidt/WORMSTATION_RECORDINGS/",
