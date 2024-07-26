@@ -1,12 +1,12 @@
-from PyQt5 import QtGui, QtCore
 import paramiko
 import os
-import time
-from datetime import datetime
 import subprocess
+import getpass
+import threading
+import sys
+import select
 
-from math import log10,ceil
-from src.QontrollerUI import *
+from PyQt5 import QtCore, QtGui
 
 class Device:
 
@@ -14,16 +14,11 @@ class Device:
         self.name = name
         self.id = id
         self.uptodate = uptodate
-
-        self.ssh = paramiko.SSHClient()
-        
         self.username = username
-
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.connected = False
         self.ssh_connect()
-
-
-
 
     def __del__(self):
         self.ssh.close()
@@ -31,10 +26,7 @@ class Device:
     @property
     def is_running(self):
         stdin, stdout, stderr = self.ssh.exec_command("pgrep picam", get_pty=True)
-        if stdout.readline() == '':
-            return False
-        else:
-            return True
+        return stdout.readline() != ''
 
     @property
     def is_uptodate(self):
@@ -50,9 +42,6 @@ class Device:
         if self.is_running:
             print("Device %s is running : update skipped" % self.name)
         else:
-            ## hard pull
-            # stdin, stdout, stderr = self.ssh.exec_command(
-            #    "cd /home/matthieu/piworm && git reset --hard origin/main && git pull", get_pty=True)
             stdin, stdout, stderr = self.ssh.exec_command(f"cd /home/{self.username}/piworm && git pull", get_pty=True)
             for line in iter(stdout.readline, ""):
                 print(line, end="")
@@ -65,23 +54,19 @@ class Device:
             try:
                 self.ssh.load_system_host_keys()
                 self.ssh.connect(self.name, port=22, username=self.username, timeout=3)
-                self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
                 self.connected = True
             except paramiko.ssh_exception.SSHException as e:
                 print(e)
                 if os.name == 'nt':
-                    subprocess.run([r'type', r'%userprofile%\.ssh\id_rsa.pub','|','ssh',f'{self.username}@{self.name}',r"cat >> .ssh/authorized_keys"], shell=True)
+                    subprocess.run([r'type', r'%userprofile%\.ssh\id_rsa.pub', '|', 'ssh', f'{self.username}@{self.name}', r"cat >> .ssh/authorized_keys"], shell=True)
                 else:
                     os.system(f"ssh-copy-id {self.username}@{self.name}")
                 i += 1
             except paramiko.ssh_exception.NoValidConnectionsError as e:
                 print(e)
                 print(f'Device {self.name} is unreachable.')
-
                 i += 1
-
-            finally:
-                return self.connected
+        return self.connected
 
     def receive_json_config_file(self, file):
         with self.ssh.open_sftp() as sftp:
@@ -90,30 +75,22 @@ class Device:
             try:
                 sftp.mkdir(remote_folder)
             except IOError:
-                # Folder already exists
-                pass
-
+                pass  # Folder already exists
             sftp.put(file, remote_path)
-
         return remote_path
 
-
-    def get_frame(self,settings_remote_path):
+    def get_frame(self, settings_remote_path):
         if self.is_running:
             return self.import_last_frame_from_device()
         else:
             return self.acquire_new_frame(settings_remote_path)
 
     def read_remote_frame(self, filename):
-        sftp = self.ssh.open_sftp()
-        frame_bytes = sftp.file(filename, mode='r').read()
-
-        ba = QtCore.QByteArray(frame_bytes)
-        new_pixmap = QtGui.QPixmap()
-        ok = new_pixmap.loadFromData(ba, "JPG")
-
-        sftp.close()
-
+        with self.ssh.open_sftp() as sftp:
+            frame_bytes = sftp.file(filename, mode='r').read()
+            ba = QtCore.QByteArray(frame_bytes)
+            new_pixmap = QtGui.QPixmap()
+            new_pixmap.loadFromData(ba, "JPG")
         return new_pixmap
 
     def import_last_frame_from_device(self):
@@ -126,45 +103,26 @@ class Device:
 
     def acquire_new_frame(self, config_file):
         self.start(config_file, background_mode=False)
-        """
-        command = 'picam -o /home/matthieu/tmp/preview.jpg -v -t 0 -avg %d -ti %f -q %d -ss %d -br %d -iso %d -l %d -vv -a' % \
-                  (s.averaging, s.time_interval, s.jpg_quality, s.shutter_speed, s.brightness, s.iso, s.led_intensity)
-        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
-        for line in iter(stdout.readline, ""):
-            print(line, end="")
-        """
         return self.read_remote_frame(f"/home/{self.username}/tmp/last_frame.jpg")
 
     def record(self, config_file):
-
         print(self.name)
         if self.is_running:
             print("WARNING : Device %s is already running. Recording ignored")
         else:
-            #print(s)
-            print("\n\n\n")
             self.start(config_file, background_mode=True)
 
     def start(self, config_file, background_mode=False):
-
         rec_command = f'picam {config_file}'
-
-        if background_mode:
-            log_folder = self.create_log_folder()
-            command = f'nohup {rec_command}'
-        else:
-            command = rec_command
-
+        command = f'nohup {rec_command}' if background_mode else rec_command
         print(command)
         try:
             stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
             for line in iter(stdout.readline, ""):
                 print(line, end="")
-
         except paramiko.ssh_exception.SSHException as e:
             print(e)
             print(f"Connection with device {self.name} lost")
-
 
     def stop(self):
         stdin, stdout, stderr = self.ssh.exec_command("pkill picam", get_pty=True)
@@ -181,23 +139,63 @@ class Device:
         del self
 
     def turn_on_led(self, pin):
-        stdin, stdout, stderr = (
-            self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_on_led.py {pin}", get_pty=True))
+        self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_on_led.py {pin}", get_pty=True)
 
     def turn_off_led(self, pin):
-        stdin, stdout, stderr = (
-            self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_off_led.py {pin}", get_pty=True))
+        self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_off_led.py {pin}", get_pty=True)
 
     def create_log_folder(self):
         log_folder = f"/home/{self.username}/log"
-        try:
-            with self.ssh.open_sftp() as sftp:
+        with self.ssh.open_sftp() as sftp:
+            try:
                 sftp.mkdir(log_folder)
-        except:
-            pass
-
+            except IOError:
+                pass  # Folder already exists
         return log_folder
 
     def clear_tmp_folder(self):
         print(f'Clear folder /home/{self.username}/.wormstation_tmp/ on {self.name}')
-        stdin, stdout, stderr = self.ssh.exec_command(f"rm -rf /home/{self.username}/.wormstation_tmp/*", get_pty=True)
+        self.ssh.exec_command(f"rm -rf /home/{self.username}/.wormstation_tmp/*", get_pty=True)
+
+
+
+class DeviceInstaller:
+    def __init__(self, device, sudo_password):
+        self.name = device.name
+        self.username = device.username
+        self.ssh = device.ssh
+        self.sudo_password = sudo_password
+
+    def run_install_script(self):
+        print(f'\n\n\nRUNNING INSTALL SCRIPT ON {self.name}\n')
+        stdin, stdout, stderr = self.ssh.exec_command(f"bash /home/{self.username}/piworm/INSTALL.sh -y", get_pty=True)
+
+        # Function to send the password when sudo prompts for it
+        def handle_password(stdin, stdout):
+            while not stdout.channel.exit_status_ready():
+                if stdout.channel.recv_ready():
+                    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+                    if rl:
+                        line = stdout.channel.recv(1024).decode('utf-8')
+                        sys.stdout.write(line)
+                        if 'password' in line.lower():
+                            stdin.write(f"{self.sudo_password}\n")
+                            stdin.flush()
+
+        # Process output from the command and handle password prompt sequentially
+        handle_password(stdin, stdout)
+
+        # Ensure all output is read
+        stdout.channel.recv_exit_status()
+
+        # Read any remaining output
+        for line in iter(stdout.readline, ""):
+            print(line, end="")
+
+        print(f"Finished install script on {self.name}")
+
+
+
+
+
+

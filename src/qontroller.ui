@@ -956,6 +956,13 @@
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="btnRunInstall">
+                <property name="text">
+                 <string>Run Install Script</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="btnReboot">
                 <property name="text">
                  <string>Reboot</string>

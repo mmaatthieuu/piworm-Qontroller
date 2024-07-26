@@ -9,11 +9,15 @@ import datetime as dt
 import time
 import subprocess
 
+import threading
+
+import getpass
+
 #from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
 from itertools import compress
 
-from .device import Device
+from .device import Device, DeviceInstaller
 from .picam_settings import PicamSettings
 
 from .device_manager import DeviceManager
@@ -366,7 +370,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "use_ssh":			False,
                      "ssh_destination": self.lineEditSshDest.text(),
                      "ssh_dir":         "/media/scientist/SanDisk",
-                     "smb_service":		"//lpbsnas1.epfl.ch/LPBS2",
                      "nas_server":		"//lpbsnas1.epfl.ch",
                      "share_name":		"LPBS2",
                      "workgroup":		None,
@@ -580,6 +583,17 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def on_btnClearTmpFolder_clicked(self):
         for d in self.host_list:
             d.clear_tmp_folder()
+
+    @QtCore.pyqtSlot()
+    def on_btnRunInstall_clicked(self):
+        sudo_password = getpass.getpass(prompt='Enter your sudo password: ')
+
+        for d in self.host_list:
+            try:
+                installer = DeviceInstaller(d, sudo_password)
+                installer.run_install_script()
+            except Exception as e:
+                print(f"Failed to run script on {d.name}: {e}")
 
     @QtCore.pyqtSlot()
     def on_btnShutdown_clicked(self):
