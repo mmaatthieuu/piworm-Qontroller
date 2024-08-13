@@ -8,6 +8,8 @@ import json
 import datetime as dt
 import time
 import subprocess
+import sys
+import shutil
 
 import threading
 
@@ -74,6 +76,18 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         #self.resize(QtWidgets.QDesktopWidget().availableGeometry(self).size() * 0.8)
         self.centerandresize()
+
+
+        # Set the default help text
+        self.default_help_text = "Help: Hover any item to display help"
+        self.label_help.setText(self.default_help_text)
+
+        # Set tooltips for widgets
+        self.set_tooltips()
+
+        # Install event filters
+        self.install_event_filters()
+
 
         # Attributes
 
@@ -151,6 +165,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     #    # show context menu
      #   self.popMenu.exec_(self.listBoxDevices.mapToGlobal(point))
 
+
     def check_date(self):
         # set limit date to 28.02.2024
         limit_date = dt.datetime(2024, 3, 4).date()
@@ -194,6 +209,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def test_function(self):
         print("yo")
 
+    '''
     def eventFilter(self, source, event):
         if (event.type() == QtCore.QEvent.ContextMenu and
                 source is self.listBoxDevices):
@@ -212,7 +228,35 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             """
             return True
         return super(QontrollerUI, self).eventFilter(source, event)
+        
+    '''
 
+    def set_tooltips(self):
+        self.btnRefresh.setToolTip("Refreshes the current view.")
+        self.btnRescanDevices.setToolTip("Rescans all available devices.")
+        self.sliderZoom.setToolTip("Adjust the zoom level of the displayed image.")
+        self.btnFitView.setToolTip("Fit the image to the view area.")
+        self.listBoxDevices.setToolTip("List of connected devices. Devices in italic are currently running.")
+        # Add more tooltips as needed
+
+    def install_event_filters(self):
+        widgets = [
+            self.btnRefresh, self.btnRescanDevices, self.sliderZoom, self.btnFitView, self.listBoxDevices
+            # Add more widgets as needed
+        ]
+
+        for widget in widgets:
+            widget.installEventFilter(self)
+
+    def eventFilter(self, source, event):
+        if event.type() == QtCore.QEvent.Enter:
+            if isinstance(source, QtWidgets.QWidget):
+                help_text = source.toolTip()
+                self.label_help.setText(help_text)
+        elif event.type() == QtCore.QEvent.Leave:
+            self.label_help.setText(self.default_help_text)
+
+        return super(QontrollerUI, self).eventFilter(source, event)
 
     def contextMenuEvent(self, event):
         contextMenu = QtWidgets.QMenu(self)
@@ -475,6 +519,9 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         devices_marked_for_recording = self.get_devices_marked_for_recording()
 
         config = self.generate_json_config_from_GUI_widgets(preview_mode=False)
+
+        #print(config)
+
         file = self.save_json_config_file(config)
 
         # Check if all the devices are up-to-date.
@@ -620,3 +667,63 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         fname = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file',
                                                       '/home/matthieu/data/PIWORM', "Image files (*.jpg *.gif)")
         self.labelDisplay_2.setPixmap(QtGui.QPixmap(fname[0]))
+
+    @QtCore.pyqtSlot()
+    def on_btnDestDir_clicked(self):
+        config = self.generate_json_config_from_GUI_widgets(preview_mode=False)
+
+        # Determine the destination directory based on use_samba
+        if config.get("use_samba"):
+            nas_server = config.get("nas_server", "").rstrip("/")
+            share_name = config.get("share_name", "").lstrip("/").rstrip("/")
+            smb_dir = config.get("smb_dir", "").lstrip("/")
+
+            # Construct the SMB path
+            smb_path = f"smb:{nas_server}/{share_name}/{smb_dir}"
+
+            if os.name == 'nt':  # Windows
+                # Build the path separately
+                smb_dir_windows = smb_dir.replace('/', '\\')
+                destination_directory = f"\\\\{nas_server}\\{share_name}\\{smb_dir_windows}"
+                try:
+                    os.startfile(destination_directory)
+                except Exception as e:
+                    print(f"Failed to open the directory: {e}")
+
+            elif os.name == 'posix':  # macOS or Linux
+                try:
+                    if sys.platform == 'darwin':  # macOS
+                        subprocess.run(["open", smb_path], check=True)
+                    else:  # Linux
+                        # Attempt to use the default file manager to open the SMB path
+                        if shutil.which("nautilus"):
+                            print(smb_path)
+                            subprocess.run(["nautilus", smb_path], check=True)
+                        elif shutil.which("xdg-open"):
+                            subprocess.run(["xdg-open", smb_path], check=True)
+                        else:
+                            print("No suitable file manager found.")
+                except subprocess.CalledProcessError as e:
+                    print(f"Failed to open the directory: {e}")
+        else:
+            # Retrieve the local output directory from the configuration
+            destination_directory = config.get("local_output_dir")
+
+            # If the directory is not set, use the user's home directory as default
+            if not destination_directory:
+                destination_directory = os.path.expanduser("~")  # Default to the user's home directory
+
+            # Ensure the directory exists (for local directories)
+            if not os.path.exists(destination_directory):
+                os.makedirs(destination_directory)
+
+            # Open the directory in the file explorer
+            try:
+                if os.name == 'nt':  # Windows
+                    os.startfile(destination_directory)
+                elif os.name == 'posix':  # macOS or Linux
+                    subprocess.run(['open' if sys.platform == 'darwin' else 'xdg-open', destination_directory])
+            except Exception as e:
+                print(f"Failed to open the directory: {e}")
+
+

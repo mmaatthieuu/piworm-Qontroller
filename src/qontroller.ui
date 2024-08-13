@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2451</width>
-    <height>1448</height>
+    <width>2436</width>
+    <height>1460</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,8 +59,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>2127</width>
-          <height>1353</height>
+          <width>2112</width>
+          <height>1365</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -132,7 +132,7 @@
              <x>0</x>
              <y>0</y>
              <width>278</width>
-             <height>1333</height>
+             <height>1345</height>
             </rect>
            </property>
            <property name="maximumSize">
@@ -379,7 +379,7 @@
                    <number>1000000</number>
                   </property>
                   <property name="value">
-                   <number>50000</number>
+                   <number>30000</number>
                   </property>
                  </widget>
                 </item>
@@ -734,11 +734,7 @@
                  </widget>
                 </item>
                 <item row="16" column="1">
-                 <widget class="QSpinBox" name="spinBoxVerbosity">
-                  <property name="value">
-                   <number>5</number>
-                  </property>
-                 </widget>
+                 <widget class="QSpinBox" name="spinBoxVerbosity"/>
                 </item>
                 <item row="17" column="0">
                  <widget class="QLabel" name="label_5">
@@ -889,6 +885,13 @@
                </layout>
               </item>
               <item>
+               <widget class="QPushButton" name="btnDestDir">
+                <property name="text">
+                 <string>Open Dest. Dir</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <spacer name="verticalSpacer_4">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -1027,7 +1030,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2451</width>
+     <width>2436</width>
      <height>22</height>
     </rect>
    </property>
