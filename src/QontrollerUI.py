@@ -684,8 +684,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                 destination_directory = f"\\\\{nas_server}\\{share_name}\\{smb_dir_windows}"
 
                 try:
-                    # Use subprocess to open the network path in Windows Explorer
-                    subprocess.run(["explorer", destination_directory], check=True)
+                    # Use the start command to open the network path correctly in Windows Explorer
+                    subprocess.run(["cmd", "/c", "start", destination_directory], check=True)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to open the directory: {e}")
 
@@ -726,6 +726,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                     subprocess.run(['open' if sys.platform == 'darwin' else 'xdg-open', destination_directory])
             except Exception as e:
                 print(f"Failed to open the directory: {e}")
+
 
 
 
