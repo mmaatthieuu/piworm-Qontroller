@@ -236,6 +236,12 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             new_item.setCheckState(QtCore.Qt.Checked)
             #self.listWidgetTestCases.addItem(item)
 
+            # Check if the device is running
+            if new_device.is_running:
+                font = new_item.font()
+                font.setItalic(True)
+                new_item.setFont(font)
+
             ch = QtWidgets.QCheckBox()
             #new_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
             self.listBoxDevices.addItem(new_item)
@@ -594,6 +600,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                 installer.run_install_script()
             except Exception as e:
                 print(f"Failed to run script on {d.name}: {e}")
+
+        print("Installation finished")
 
     @QtCore.pyqtSlot()
     def on_btnShutdown_clicked(self):
