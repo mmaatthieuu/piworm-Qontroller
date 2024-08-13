@@ -680,8 +680,11 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
             if os.name == 'nt':  # Windows
                 # Build the correct SMB path for Windows using raw string or forward slashes
+                print(smb_dir)
                 smb_dir_windows = smb_dir.replace('/', '\\')
+                print(smb_dir_windows)
                 destination_directory = rf"\\{nas_server}\{share_name}\{smb_dir_windows}"
+                print(destination_directory)
 
                 try:
                     os.startfile(destination_directory)
