@@ -678,6 +678,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             share_name = config.get("share_name", "").lstrip("/").rstrip("/")
             smb_dir = config.get("smb_dir", "").lstrip("/")
 
+            #need to check for windows
+
             # Construct the SMB path
             smb_path = f"smb:{nas_server}/{share_name}/{smb_dir}"
 
