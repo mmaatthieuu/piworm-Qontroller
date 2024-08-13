@@ -679,15 +679,13 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             smb_dir = config.get("smb_dir", "").lstrip("/")
 
             if os.name == 'nt':  # Windows
-                # Build the correct SMB path for Windows using raw string or forward slashes
-                print(smb_dir)
+                # Construct the network path for Windows
                 smb_dir_windows = smb_dir.replace('/', '\\')
-                print(smb_dir_windows)
                 destination_directory = rf"\\{nas_server}\{share_name}\{smb_dir_windows}"
-                print(destination_directory)
 
                 try:
-                    os.startfile(destination_directory)
+                    # Use os.system to open the network path directly in Windows Explorer
+                    os.system(f'explorer "{destination_directory}"')
                 except Exception as e:
                     print(f"Failed to open the directory: {e}")
 
@@ -728,6 +726,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                     subprocess.run(['open' if sys.platform == 'darwin' else 'xdg-open', destination_directory])
             except Exception as e:
                 print(f"Failed to open the directory: {e}")
+
 
 
 
