@@ -681,12 +681,12 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             if os.name == 'nt':  # Windows
                 # Construct the network path for Windows
                 smb_dir_windows = smb_dir.replace('/', '\\')
-                destination_directory = rf"\\{nas_server}\{share_name}\{smb_dir_windows}"
+                destination_directory = f"\\\\{nas_server}\\{share_name}\\{smb_dir_windows}"
 
                 try:
-                    # Use os.system to open the network path directly in Windows Explorer
-                    os.system(f'explorer "{destination_directory}"')
-                except Exception as e:
+                    # Use subprocess to open the network path in Windows Explorer
+                    subprocess.run(["explorer", destination_directory], check=True)
+                except subprocess.CalledProcessError as e:
                     print(f"Failed to open the directory: {e}")
 
             elif os.name == 'posix':  # macOS or Linux
