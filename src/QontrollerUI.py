@@ -674,32 +674,30 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         # Determine the destination directory based on use_samba
         if config.get("use_samba"):
-            nas_server = config.get("nas_server", "").rstrip("/")
+            nas_server = config.get("nas_server", "").lstrip("/").rstrip("/")
             share_name = config.get("share_name", "").lstrip("/").rstrip("/")
             smb_dir = config.get("smb_dir", "").lstrip("/")
 
-            #need to check for windows
-
-            # Construct the SMB path
-            smb_path = f"smb:{nas_server}/{share_name}/{smb_dir}"
-
             if os.name == 'nt':  # Windows
-                # Build the path separately
+                # Build the correct SMB path for Windows
                 smb_dir_windows = smb_dir.replace('/', '\\')
                 destination_directory = f"\\\\{nas_server}\\{share_name}\\{smb_dir_windows}"
+
                 try:
                     os.startfile(destination_directory)
                 except Exception as e:
                     print(f"Failed to open the directory: {e}")
 
             elif os.name == 'posix':  # macOS or Linux
+                # Construct the SMB path
+                smb_path = f"smb://{nas_server}/{share_name}/{smb_dir}"
+
                 try:
                     if sys.platform == 'darwin':  # macOS
                         subprocess.run(["open", smb_path], check=True)
                     else:  # Linux
                         # Attempt to use the default file manager to open the SMB path
                         if shutil.which("nautilus"):
-                            print(smb_path)
                             subprocess.run(["nautilus", smb_path], check=True)
                         elif shutil.which("xdg-open"):
                             subprocess.run(["xdg-open", smb_path], check=True)
@@ -727,5 +725,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                     subprocess.run(['open' if sys.platform == 'darwin' else 'xdg-open', destination_directory])
             except Exception as e:
                 print(f"Failed to open the directory: {e}")
+
 
 
