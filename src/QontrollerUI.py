@@ -161,9 +161,23 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         # When stop_btn is clicked this runs. Terminates the worker and the thread.
 
+    def closeEvent(self, event):
+        self.cleanup()  # Call the cleanup function
+        event.accept()  # Accept the event to close the window
+
+
     #def on_context_menu(self, point): # not used anymore
     #    # show context menu
      #   self.popMenu.exec_(self.listBoxDevices.mapToGlobal(point))
+
+    def cleanup(self):
+        print("Cleaning up")
+
+        self.slider_switch_led.setValue(0)
+        self.slider_switch_led_OG.setValue(0)
+
+        self.switch_led_IR(all_devices=True)
+        self.switch_led_OG(all_devices=True)
 
 
     def check_date(self):
@@ -558,27 +572,33 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             if d in devices_marked_for_recording:
                 d.stop()
 
-    def turn_on_leds(self, pin):
-        devices_marked_for_recording = self.get_devices_marked_for_recording()
-        for d in devices_marked_for_recording:
-            d.turn_on_led(pin=pin)
+    def turn_on_leds(self, pin, all_devices=False):
+        device_list = self.host_list if all_devices else self.get_devices_marked_for_recording()
+        for d in device_list:
+            if d.is_running:
+                print(f" device {d.name} is running, skipping led activation, pin {pin}")
+            else:
+                d.turn_on_led(pin=pin)
 
-    def turn_off_leds(self, pin):
-        devices_marked_for_recording = self.get_devices_marked_for_recording()
-        for d in devices_marked_for_recording:
-            d.turn_off_led(pin=pin)
+    def turn_off_leds(self, pin, all_devices=False):
+        device_list = self.host_list if all_devices else self.get_devices_marked_for_recording()
+        for d in device_list:
+            if d.is_running:
+                print(f" device {d.name} is running, skipping led deactivation (pin {pin})")
+            else:
+                d.turn_off_led(pin=pin)
 
-    def switch_led_IR(self, pin=17):
+    def switch_led_IR(self, pin=17, all_devices=False):
         if self.slider_switch_led.value() == 0:
-            self.turn_off_leds(pin=pin)
+            self.turn_off_leds(pin=pin, all_devices=all_devices)
         else:
-            self.turn_on_leds(pin=pin)
+            self.turn_on_leds(pin=pin, all_devices=all_devices)
 
-    def switch_led_OG(self, pin=18):
+    def switch_led_OG(self, pin=18, all_devices=False):
         if self.slider_switch_led_OG.value() == 0:
-            self.turn_off_leds(pin=pin)
+            self.turn_off_leds(pin=pin, all_devices=all_devices)
         else:
-            self.turn_on_leds(pin=pin)
+            self.turn_on_leds(pin=pin, all_devices=all_devices)
 
     def running_devices(self):
         running_list = []
