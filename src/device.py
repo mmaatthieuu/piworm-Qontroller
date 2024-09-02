@@ -5,6 +5,8 @@ import getpass
 import threading
 import sys
 import select
+import time
+import signal
 
 from PyQt5 import QtCore, QtGui
 
@@ -27,6 +29,28 @@ class Device:
     def is_running(self):
         stdin, stdout, stderr = self.ssh.exec_command("pgrep picam", get_pty=True)
         return stdout.readline() != ''
+
+    @property
+    def recording_status(self):
+        """Check the status of the recording over SSH."""
+        try:
+            # Try to read the status file
+            stdin, stdout, stderr = self.ssh.exec_command(f"cat /home/{self.username}/tmp/status.txt", get_pty=True)
+            status = stdout.readline().strip()
+
+            print(f"DEBUG : Device {self.name} status: {status}")
+
+            if status == 'Recording':
+                return 'Recording is ongoing'
+            elif status == 'Paused':
+                return 'Recording is paused'
+            elif status == 'Not Running':
+                return 'Recording is not running'
+            else:
+                return 'Unknown status'
+        except FileNotFoundError:
+            # If the file does not exist, handle the error gracefully
+            return 'Status file not found, recording might not have started'
 
     @property
     def is_uptodate(self):
@@ -80,10 +104,40 @@ class Device:
         return remote_path
 
     def get_frame(self, settings_remote_path):
+        status = self.recording_status
+
+        #print(f"DEBUG : Device {self.name} status: {status}")
         if self.is_running:
-            return self.import_last_frame_from_device()
+            if status == 'Recording is ongoing':
+                # If the recording is ongoing, import the last frame
+                return self.import_last_frame_from_device()
+            elif status == 'Recording is paused':
+                # If the recording is paused, send signal to get a new frame and then import it
+                self.send_signal_to_server(signal.SIGUSR1)
+                time.sleep(2)  # Wait a little for the server to capture the new frame
+                return self.import_last_frame_from_device()
+            elif status == 'Recording is not running':
+                # If recording is not running, acquire a new frame
+                return self.acquire_new_frame(settings_remote_path)
+            else:
+                print("Unknown recording status. Cannot get frame.")
+                return None
+
         else:
             return self.acquire_new_frame(settings_remote_path)
+
+    def send_signal_to_server(self, signal_type):
+        """Send a signal to the server to trigger a new frame capture."""
+        # Get the PID of the recording script on the server
+        stdin, stdout, stderr = self.ssh.exec_command("pgrep -f picam", get_pty=True)
+        pid = stdout.readline().strip()
+
+        if pid:
+            # Send the custom signal to the server process
+            self.ssh.exec_command(f"kill -{signal_type} {pid}")
+            print(f"Sent signal {signal_type} to server process {pid}.")
+        else:
+            print("Server recording script is not running.")
 
     def read_remote_frame(self, filename):
         with self.ssh.open_sftp() as sftp:
@@ -158,7 +212,6 @@ class Device:
         self.ssh.exec_command(f"rm -rf /home/{self.username}/.wormstation_tmp/*", get_pty=True)
 
 
-
 class DeviceInstaller:
     def __init__(self, device, sudo_password):
         self.name = device.name
@@ -193,9 +246,3 @@ class DeviceInstaller:
             print(line, end="")
 
         print(f"Finished install script on {self.name}")
-
-
-
-
-
-

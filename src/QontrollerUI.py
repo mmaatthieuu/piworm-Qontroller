@@ -250,7 +250,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.btnRescanDevices.setToolTip("Rescans all available devices.")
         self.sliderZoom.setToolTip("Adjust the zoom level of the displayed image.")
         self.btnFitView.setToolTip("Fit the image to the view area.")
-        self.listBoxDevices.setToolTip("List of connected devices. Devices in italic are currently running.")
+        self.listBoxDevices.setToolTip("List of connected devices. Devices in italic are currently running. "
+                                       "Edit the file hosts_list to add or remove devices.")
         # Add more tooltips as needed
 
     def install_event_filters(self):
