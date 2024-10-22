@@ -101,6 +101,10 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.do_auto_refresh = self.btnLiveView.isChecked()
 
         self.comboTimeoutUnit.addItems(["Seconds", "Minutes", "Hours"])
+        self.comboOptoColor.addItems(["Orange","Blue"])
+        self.comboCurrent.addItems(["7.5mA","12.5mA","25mA","37.5mA","50mA","75mA","100mA"])
+        # sel default value for comboCurrent to 37.5mA
+        self.comboCurrent.setCurrentIndex(3)
 
         self.dm = DeviceManager()
 
@@ -112,9 +116,17 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.listBoxDevices.currentItemChanged.connect(self.current_item_changed)
         self.sliderZoom.valueChanged.connect(self.zoom)
 
-        self.slider_switch_led.valueChanged.connect(lambda: self.switch_led_IR(pin=IR_PIN))
-        self.slider_switch_led_OG.valueChanged.connect(lambda: self.switch_led_OG(pin=OG_PIN))
+        # Connect sliders to the generalized LED switch function
+        self.slider_switch_led.valueChanged.connect(
+            lambda: self.switch_led(color='IR', current='37.5mA', all_devices=False))
+        self.slider_switch_led_OG.valueChanged.connect(
+            lambda: self.switch_led(color='Orange', current='37.5mA', all_devices=False))
+        self.slider_switch_led_blue.valueChanged.connect(
+            lambda: self.switch_led(color='Blue', current='37.5mA', all_devices=False))
 
+        # When the combo box for the current is changed, update the current value
+        # self.comboCurrent.currentIndexChanged.connect(
+        #     lambda: self.switch_led(color='IR', current=self.comboCurrent.currentText(), all_devices=False))
 
         self.listBoxDevices.installEventFilter(self)
 
@@ -173,12 +185,15 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def cleanup(self):
         print("Cleaning up")
 
+        # Set all sliders to 0 (which should represent the 'off' state)
         self.slider_switch_led.setValue(0)
         self.slider_switch_led_OG.setValue(0)
+        self.slider_switch_led_blue.setValue(0)
 
-        self.switch_led_IR(all_devices=True)
-        self.switch_led_OG(all_devices=True)
-
+        # Turn off all LEDs for all devices
+        self.switch_led(color='IR', current='37.5mA', all_devices=True)
+        self.switch_led(color='Orange', current='37.5mA', all_devices=True)
+        self.switch_led(color='Blue', current='37.5mA', all_devices=True)
 
     def check_date(self):
         # set limit date to 28.02.2024
@@ -361,8 +376,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
                 self.display_frame_pixmap(self.full_pixmap)
 
-                self.switch_led_IR()
-                self.switch_led_OG()
+                # self.switch_led_IR()
+                # self.switch_led_OG()
 
             else:
                 print("Please first select a device")
@@ -428,6 +443,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "start_frame":		self.spinStartingFrame.value(),
                      "illumination_pulse":  self.spinIlluminationPulse.value(),
                      "optogenetic":     self.checkBoxOptogen.isChecked(),
+                     "optogenetic_color": self.comboOptoColor.currentText(),
                      "pulse_duration":  self.spinPulseDuration.value(),
                      "pulse_interval":  self.spinPulseInterval.value(),
                      "annotate_frames": True,
@@ -573,33 +589,50 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             if d in devices_marked_for_recording:
                 d.stop()
 
-    def turn_on_leds(self, pin, all_devices=False):
+    def turn_on_leds(self, color, current='37.5mA', all_devices=False):
+        """Turn on LEDs for all or selected devices."""
         device_list = self.host_list if all_devices else self.get_devices_marked_for_recording()
         for d in device_list:
             if d.is_running:
-                print(f" device {d.name} is running, skipping led activation, pin {pin}")
+                print(f" device {d.name} is running, skipping LED activation for color {color}")
             else:
-                d.turn_on_led(pin=pin)
+                d.switch_led(color=color, state=1, current=current)  # Use switch_led with state=1 for turning on
 
-    def turn_off_leds(self, pin, all_devices=False):
+    def turn_off_leds(self, color, current='37.5mA', all_devices=False):
+        """Turn off LEDs for all or selected devices."""
         device_list = self.host_list if all_devices else self.get_devices_marked_for_recording()
         for d in device_list:
             if d.is_running:
-                print(f" device {d.name} is running, skipping led deactivation (pin {pin})")
+                print(f" device {d.name} is running, skipping LED deactivation for color {color}")
             else:
-                d.turn_off_led(pin=pin)
+                d.switch_led(color=color, state=0, current=current)  # Use switch_led with state=0 for turning off
 
-    def switch_led_IR(self, pin=17, all_devices=False):
-        if self.slider_switch_led.value() == 0:
-            self.turn_off_leds(pin=pin, all_devices=all_devices)
-        else:
-            self.turn_on_leds(pin=pin, all_devices=all_devices)
+    def switch_led(self, color, current='37.5mA', all_devices=False):
+        """Switch the specified LED on or off based on slider value."""
+        # Get the correct slider based on the color
+        slider = None
+        if color == 'IR':
+            slider = self.slider_switch_led
+        elif color == 'Orange':
+            slider = self.slider_switch_led_OG
+        elif color == 'Blue':
+            slider = self.slider_switch_led_blue
 
-    def switch_led_OG(self, pin=18, all_devices=False):
-        if self.slider_switch_led_OG.value() == 0:
-            self.turn_off_leds(pin=pin, all_devices=all_devices)
-        else:
-            self.turn_on_leds(pin=pin, all_devices=all_devices)
+        if slider is None:
+            print(f"Invalid color '{color}'")
+            return
+
+        status = slider.value()
+        current = self.comboCurrent.currentText()
+
+        device_list = self.host_list if all_devices else self.get_devices_marked_for_recording()
+
+        for d in device_list:
+            if d.is_running:
+                print(f" device {d.name} is running, skipping LED deactivation for color {color}")
+            else:
+                print(f"Switching {color} LED on device {d.name} to state {status} with current {current}")
+                d.switch_led(color=color, state=status, current=current)  # Use switch_led with state=0 for turning off
 
     def running_devices(self):
         running_list = []

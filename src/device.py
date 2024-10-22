@@ -192,11 +192,23 @@ class Device:
         stdin, stdout, stderr = self.ssh.exec_command("sudo reboot", get_pty=True)
         del self
 
-    def turn_on_led(self, pin):
-        self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_on_led.py {pin}", get_pty=True)
+    def turn_on_led(self, color, current='37.5mA'):
+        """Turn on the LED of the specified color remotely."""
+        self.ssh.exec_command(
+            f"python ~/piworm/led_switch.py --color {color} --state 1 --current {current}",
+            get_pty=True)
 
-    def turn_off_led(self, pin):
-        self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_off_led.py {pin}", get_pty=True)
+    def turn_off_led(self, color, current='37.5mA'):
+        """Turn off the LED of the specified color remotely."""
+        self.ssh.exec_command(
+            f"python ~/piworm/led_switch.py --color {color} --state 0 --current {current}",
+            get_pty=True)
+
+    def switch_led(self, color, state, current):
+        """Switch the specified LED on or off with the specified current."""
+        self.ssh.exec_command(
+            f"python ~/piworm/led_switch.py --color {color} --state {state} --current {current}",
+            get_pty=True)
 
     def create_log_folder(self):
         log_folder = f"/home/{self.username}/log"
