@@ -417,7 +417,7 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_4">
                   <property name="text">
-                   <string>Shutter Speed (us)</string>
+                   <string>Shutter Speed (µs)</string>
                   </property>
                  </widget>
                 </item>

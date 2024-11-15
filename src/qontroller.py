@@ -554,7 +554,7 @@ class Ui_MainWindow(object):
         self.label_11.setText(_translate("MainWindow", "ON"))
         self.label_29.setText(_translate("MainWindow", "Current [mA]"))
         self.label.setText(_translate("MainWindow", "Parameters"))
-        self.label_4.setText(_translate("MainWindow", "Shutter Speed (us)"))
+        self.label_4.setText(_translate("MainWindow", "Shutter Speed (µs)"))
         self.label_10.setText(_translate("MainWindow", "Timeout Unit"))
         self.labelTimeout.setText(_translate("MainWindow", "Timeout"))
         self.label_22.setText(_translate("MainWindow", "Record for (s)"))

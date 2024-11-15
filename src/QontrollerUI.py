@@ -2,6 +2,7 @@ import time
 
 import paramiko.ssh_exception
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox, QMenu
 import os
 from . import qontroller
 import json
@@ -11,16 +12,18 @@ import subprocess
 import sys
 import shutil
 
+from concurrent.futures import ThreadPoolExecutor
+
 import threading
 
 import getpass
 
 #from multiprocessing import Pool
-from multiprocessing.pool import ThreadPool
-from itertools import compress
+#from multiprocessing.pool import ThreadPool
+#from itertools import compress
 
-from .device import Device, DeviceInstaller
-from .picam_settings import PicamSettings
+#from .device import Device, DeviceInstaller
+#from .picam_settings import PicamSettings
 
 from .device_manager import DeviceManager
 
@@ -186,14 +189,11 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         print("Cleaning up")
 
         # Set all sliders to 0 (which should represent the 'off' state)
+        # This is to ensure that the LEDs are turned off when the program is closed (it will call the switch_led function)
         self.slider_switch_led.setValue(0)
         self.slider_switch_led_OG.setValue(0)
         self.slider_switch_led_blue.setValue(0)
 
-        # Turn off all LEDs for all devices
-        self.switch_led(color='IR', current='37.5mA', all_devices=True)
-        self.switch_led(color='Orange', current='37.5mA', all_devices=True)
-        self.switch_led(color='Blue', current='37.5mA', all_devices=True)
 
     def check_date(self):
         # set limit date to 28.02.2024
@@ -297,30 +297,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         if action == quitAct:
             self.close()
 
-    def add_device(self, name):
-        id = self.listBoxDevices.count()
-        new_device = Device(name, id=id, username=self.lineEditUsername.text())
-
-        if new_device.connected:
-
-            new_item = QtWidgets.QListWidgetItem(name)
-
-            #item = QtWidgets.QListWidgetItem(testcase_name)
-            new_item.setFlags(new_item.flags() | QtCore.Qt.ItemIsUserCheckable)
-            new_item.setCheckState(QtCore.Qt.Checked)
-            #self.listWidgetTestCases.addItem(item)
-
-            # Check if the device is running
-            if new_device.is_running:
-                font = new_item.font()
-                font.setItalic(True)
-                new_item.setFont(font)
-
-            ch = QtWidgets.QCheckBox()
-            #new_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
-            self.listBoxDevices.addItem(new_item)
-            self.host_list.append(new_device)
-
     def right_menu_device(self, pos):
         menu = QMenu(self.listBoxDevices)
 
@@ -338,32 +314,29 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         menu.exec_(self.mapToGlobal(pos))
 
     def scan_devices(self):
+        """Scan and display devices in the UI."""
+        username = self.lineEditUsername.text()
+        self.dm.scan_devices(username=username)  # Populate devices in DeviceManager
+
         self.listBoxDevices.clear()
-        self.host_list = []
+        for device in self.dm.host_list:
+            new_item = QtWidgets.QListWidgetItem(device.name)
+            new_item.setFlags(new_item.flags() | QtCore.Qt.ItemIsUserCheckable)
+            new_item.setCheckState(QtCore.Qt.Checked)
 
-        with open("hosts_list.txt", 'r') as hosts_list:
-            for host in hosts_list.read().splitlines():
-                # device = "piworm%02d.epfl.ch" % i
-                # Check if device name is marked as a comment
-                if host and host[0] != '#':
-                    # Check if device is reachable
-                    print(f"Scanning {host}")
-                    try:
-                        if os.name == 'nt':
-                            subprocess.run(["ping", "-n", "1", "-w", "50", host], check=True)
-                        else:
-                            subprocess.run(["ping", "-c", "1", "-q", "-W", "0.05", host], check=True)
+            # If the device is running, make the text italic
+            if device.is_running:
+                font = new_item.font()
+                font.setItalic(True)
+                new_item.setFont(font)
 
-                        self.add_device(host)
-                    except subprocess.CalledProcessError:
-                        # Ping failed (timeout or non-zero return code)
-                        pass
+            self.listBoxDevices.addItem(new_item)
 
     def refresh_view(self):
         try:
             if self.currentDeviceID is not None:
                 # get the device currently selected
-                currentDevice = self.host_list[self.currentDeviceID]
+                currentDevice = self.dm.get_device_by_id(self.currentDeviceID)
 
                 config = self.generate_json_config_from_GUI_widgets(preview_mode=True)
                 file = self.save_json_config_file(config)
@@ -401,15 +374,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def on_listBoxDevices_clicked(self, index):
         pass
         #print(self.listBoxDevices.currentItemChanged())
-
-    def get_devices_marked_for_recording(self):
-        devices_marked_for_recording = []
-        for i in range(self.listBoxDevices.count()):
-            item = self.listBoxDevices.item(i)
-            if item.checkState():
-                devices_marked_for_recording.append(self.host_list[i])
-
-        return devices_marked_for_recording
 
 
     def zoom(self):
@@ -503,24 +467,14 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
             self.labelTimeout.setText("Timeout (h)")
 
     @QtCore.pyqtSlot()
-    def on_btnCheckUpdates_clicked(self, device_list=None):
-        if device_list is None:
-            device_list = self.host_list
-
-        with ThreadPool(12) as p:
-            updatable_devices_status = p.map(get_device_updatable_status, device_list)
-
-        updatable_devices = compress(device_list, updatable_devices_status)
-
-        return updatable_devices
-
+    def on_btnCheckUpdates_clicked(self, devices_list=None):
+        """Check for devices that need updates and return them."""
+        return self.dm.check_updates(devices_list)
 
     @QtCore.pyqtSlot()
     def on_btnUpdateAll_clicked(self):
-        devices_to_update =  self.on_btnCheckUpdates_clicked()
-
-        with ThreadPool(12) as p:
-            p.map(update_device, devices_to_update)
+        """Update all devices that need updating."""
+        self.dm.update_all_devices()
 
     '''
     def showdialogWarning(self, main_text, additional_text=None):
@@ -546,28 +500,46 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def on_btnRecord_clicked(self):
-
-        devices_marked_for_recording = self.get_devices_marked_for_recording()
+        devices_marked_for_recording = self.get_devices_selected_devices()
 
         config = self.generate_json_config_from_GUI_widgets(preview_mode=False)
-
-        #print(config)
-
         file = self.save_json_config_file(config)
 
-        # Check if all the devices are up-to-date.
-        # If all devices are up-to-date (on_btnCheckUpdates_clicked empty, then do recording)
-        if self.on_btnCheckUpdates_clicked(devices_marked_for_recording):
-            #s = PicamSettings(self)
-            for d in devices_marked_for_recording:
+        # Check if all devices are up-to-date
+        updatable_devices = self.on_btnCheckUpdates_clicked(devices_marked_for_recording)
+        if updatable_devices:
+            # Show a dialog with options: Cancel, Run Anyway, Update & Run
+            dialog = QMessageBox()
+            dialog.setWindowTitle("Devices Out of Date")
+            dialog.setText("Some devices are out of date. Do you want to update them before recording?")
+            dialog.setIcon(QMessageBox.Warning)
 
-                remote_path = d.receive_json_config_file(file)
+            # Add buttons
+            cancel_button = dialog.addButton("Cancel", QMessageBox.RejectRole)
+            run_anyway_button = dialog.addButton("Run Anyway", QMessageBox.AcceptRole)
+            update_and_run_button = dialog.addButton("Update & Run", QMessageBox.ActionRole)
 
-                d.record(remote_path)
+            dialog.exec_()
 
-        # Else ask to do the update
-        else:
-            showdialogWarning(main_text="Some devices are out of date. Please update them before recording.")
+            if dialog.clickedButton() == cancel_button:
+                # User chose to cancel
+                print("Recording canceled by user.")
+                os.remove(file)
+                return
+
+            elif dialog.clickedButton() == run_anyway_button:
+                # User chose to run without updating
+                print("Running recording without updating devices.")
+
+            elif dialog.clickedButton() == update_and_run_button:
+                # User chose to update and then run
+                print("Updating devices before recording.")
+                self.dm.update_all_devices()
+
+        # If no updates are needed or user chose to proceed, start the recording
+        for d in devices_marked_for_recording:
+            remote_path = d.receive_json_config_file(file)
+            d.record(remote_path)
 
         os.remove(file)
 
@@ -584,62 +556,51 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_btnStopRecord_clicked(self):
         self.on_btnLiveView_clicked(False)
-        devices_marked_for_recording = self.get_devices_marked_for_recording()
-        for d in self.running_devices():
+        devices_marked_for_recording = self.get_devices_selected_devices(exclude_running=False)
+        for d in self.dm.running_devices():
             if d in devices_marked_for_recording:
                 d.stop()
 
-    def turn_on_leds(self, color, current='37.5mA', all_devices=False):
-        """Turn on LEDs for all or selected devices."""
-        device_list = self.host_list if all_devices else self.get_devices_marked_for_recording()
-        for d in device_list:
-            if d.is_running:
-                print(f" device {d.name} is running, skipping LED activation for color {color}")
-            else:
-                d.switch_led(color=color, state=1, current=current)  # Use switch_led with state=1 for turning on
-
-    def turn_off_leds(self, color, current='37.5mA', all_devices=False):
-        """Turn off LEDs for all or selected devices."""
-        device_list = self.host_list if all_devices else self.get_devices_marked_for_recording()
-        for d in device_list:
-            if d.is_running:
-                print(f" device {d.name} is running, skipping LED deactivation for color {color}")
-            else:
-                d.switch_led(color=color, state=0, current=current)  # Use switch_led with state=0 for turning off
 
     def switch_led(self, color, current='37.5mA', all_devices=False):
         """Switch the specified LED on or off based on slider value."""
-        # Get the correct slider based on the color
-        slider = None
-        if color == 'IR':
-            slider = self.slider_switch_led
-        elif color == 'Orange':
-            slider = self.slider_switch_led_OG
-        elif color == 'Blue':
-            slider = self.slider_switch_led_blue
+        # Determine the correct slider for the color
+        slider = {
+            'IR': self.slider_switch_led,
+            'Orange': self.slider_switch_led_OG,
+            'Blue': self.slider_switch_led_blue
+        }.get(color)
 
         if slider is None:
             print(f"Invalid color '{color}'")
             return
 
+        # Get the current slider status and selected current level
         status = slider.value()
         current = self.comboCurrent.currentText()
 
-        device_list = self.host_list if all_devices else self.get_devices_marked_for_recording()
+        # Get the devices that should have their LEDs controlled
+        device_list = self.host_list if all_devices else self.get_devices_selected_devices()
 
-        for d in device_list:
-            if d.is_running:
-                print(f" device {d.name} is running, skipping LED deactivation for color {color}")
-            else:
-                print(f"Switching {color} LED on device {d.name} to state {status} with current {current}")
-                d.switch_led(color=color, state=status, current=current)  # Use switch_led with state=0 for turning off
+        # Filter out running devices
+        device_list = [d for d in device_list if not d.is_running]
 
-    def running_devices(self):
-        running_list = []
-        for d in self.host_list:
-            if d.is_running:
-                running_list.append(d)
-        return running_list
+        self.dm.switch_led(color, status, current, device_list)
+
+    def get_devices_selected_devices(self, exclude_running=True):
+        """Get devices marked for recording based on list box selections, optionally excluding running devices."""
+        selected_devices = []
+        list_box = self.listBoxDevices
+        for i in range(list_box.count()):
+            item = list_box.item(i)
+            if item.checkState():
+                device = self.dm.host_list[i]
+                if not (exclude_running and device.is_running):
+                    selected_devices.append(device)
+        return selected_devices
+
+
+
 
 
 
@@ -688,31 +649,20 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def on_btnClearTmpFolder_clicked(self):
-        for d in self.host_list:
-            d.clear_tmp_folder()
+        devices_list = self.get_devices_selected_devices()
+        self.dm.clear_tmp_folders(devices_list)
 
     @QtCore.pyqtSlot()
     def on_btnRunInstall_clicked(self):
-        sudo_password = getpass.getpass(prompt='Enter your sudo password: ')
-
-        for d in self.host_list:
-            try:
-                installer = DeviceInstaller(d, sudo_password)
-                installer.run_install_script()
-            except Exception as e:
-                print(f"Failed to run script on {d.name}: {e}")
-
-        print("Installation finished")
+        self.dm.install_on_all_devices()
 
     @QtCore.pyqtSlot()
     def on_btnShutdown_clicked(self):
-        for d in self.host_list:
-            d.shutdown()
+        self.dm.shutdown_devices()
 
     @QtCore.pyqtSlot()
     def on_btnReboot_clicked(self):
-        for d in self.host_list:
-            d.reboot()
+        self.dm.reboot_devices()
 
     ### TAB 2
 

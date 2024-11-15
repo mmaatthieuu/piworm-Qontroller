@@ -12,9 +12,9 @@ from PyQt5 import QtCore, QtGui
 
 class Device:
 
-    def __init__(self, name, id, uptodate=None, username="scientist"):
+    def __init__(self, name, uptodate=None, username="scientist"):
         self.name = name
-        self.id = id
+        #self.id = id
         self.uptodate = uptodate
         self.username = username
         self.ssh = paramiko.SSHClient()
@@ -204,11 +204,36 @@ class Device:
             f"python ~/piworm/led_switch.py --color {color} --state 0 --current {current}",
             get_pty=True)
 
+    def turn_on_led_gpio(self, pin):
+        """Old PCB. Turn on the LED of the specified color remotely."""
+        self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_on_led.py {pin}", get_pty=True)
+
+    def turn_off_led_gpio(self, pin):
+        self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_off_led.py {pin}", get_pty=True)
+
     def switch_led(self, color, state, current):
         """Switch the specified LED on or off with the specified current."""
-        self.ssh.exec_command(
+        # Execute the command and capture output
+        stdin, stdout, stderr = self.ssh.exec_command(
             f"python ~/piworm/led_switch.py --color {color} --state {state} --current {current}",
-            get_pty=True)
+            get_pty=True
+        )
+
+        # Read output and error streams
+        error_message = stdout.read().decode()
+
+        # Check if there was an error related to the missing file
+        if "No such file or directory" in error_message:
+            #print("Error detected. Falling back to GPIO control.")
+
+            # Determine pin based on color
+            pin = 17 if color == "IR" else 18
+
+            # Use GPIO-based method depending on state
+            if state == 1:
+                self.turn_on_led_gpio(pin)
+            else:
+                self.turn_off_led_gpio(pin)
 
     def create_log_folder(self):
         log_folder = f"/home/{self.username}/log"
@@ -224,37 +249,4 @@ class Device:
         self.ssh.exec_command(f"rm -rf /home/{self.username}/.wormstation_tmp/*", get_pty=True)
 
 
-class DeviceInstaller:
-    def __init__(self, device, sudo_password):
-        self.name = device.name
-        self.username = device.username
-        self.ssh = device.ssh
-        self.sudo_password = sudo_password
 
-    def run_install_script(self):
-        print(f'\n\n\nRUNNING INSTALL SCRIPT ON {self.name}\n')
-        stdin, stdout, stderr = self.ssh.exec_command(f"bash /home/{self.username}/piworm/INSTALL.sh -y", get_pty=True)
-
-        # Function to send the password when sudo prompts for it
-        def handle_password(stdin, stdout):
-            while not stdout.channel.exit_status_ready():
-                if stdout.channel.recv_ready():
-                    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-                    if rl:
-                        line = stdout.channel.recv(1024).decode('utf-8')
-                        sys.stdout.write(line)
-                        if 'password' in line.lower():
-                            stdin.write(f"{self.sudo_password}\n")
-                            stdin.flush()
-
-        # Process output from the command and handle password prompt sequentially
-        handle_password(stdin, stdout)
-
-        # Ensure all output is read
-        stdout.channel.recv_exit_status()
-
-        # Read any remaining output
-        for line in iter(stdout.readline, ""):
-            print(line, end="")
-
-        print(f"Finished install script on {self.name}")
