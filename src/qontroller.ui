@@ -206,7 +206,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <layout class="QHBoxLayout" name="LayoutSwitchBlue">
                   <item>
                    <widget class="QLabel" name="label_28">
                     <property name="text">
@@ -251,7 +251,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <layout class="QGridLayout" name="gridLayout_3">
+                 <layout class="QGridLayout" name="LayoutSwitchIR">
                   <item row="0" column="0">
                    <widget class="QLabel" name="label_18">
                     <property name="text">
@@ -312,7 +312,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <layout class="QHBoxLayout" name="horizontalLayout">
+                 <layout class="QHBoxLayout" name="LayoutSwitchOrange">
                   <item>
                    <widget class="QLabel" name="label_12">
                     <property name="text">

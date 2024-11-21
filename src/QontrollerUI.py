@@ -261,22 +261,83 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     '''
 
     def set_tooltips(self):
-        self.btnRefresh.setToolTip("Refreshes the current view.")
-        self.btnRescanDevices.setToolTip("Rescans all available devices.")
+        self.btnRefresh.setToolTip("Refreshes the current view. If the selected device is running, it will display the last recorded frame. "
+                                   "Otherwise, it will acquire a new frame.")
         self.sliderZoom.setToolTip("Adjust the zoom level of the displayed image.")
         self.btnFitView.setToolTip("Fit the image to the view area.")
+        self.btnOriginalView.setToolTip("Reset the image to its original size.")
+        self.btnLiveView.setToolTip("Toggle live view mode. When enabled, the view will automatically refresh every second. "
+                                    "Avoid using on recording devices as it may slow down the recording process.")
+
+        LED_switch_text = ("Switch the LEDs on or off. The current level can be adjusted with the dropdown menu. "
+                           "For colored LEDs, if the current exceed 37.5mA, the LED will automatically switch off after 3 seconds.")
+        self.slider_switch_led_OG.setToolTip(LED_switch_text)
+        self.slider_switch_led.setToolTip(LED_switch_text)
+        self.slider_switch_led_blue.setToolTip(LED_switch_text)
+
+        # Parameters
+        self.spinShutterSpeed.setToolTip("Shutter speed in microseconds. If set to 0, the camera will automatically adjust the shutter speed.")
+        self.comboTimeoutUnit.setToolTip("Select the time unit for the timeout value.")
+        self.spinTimeout.setToolTip("Total duration of the experiment to record. If set to 0, it will take only one frame.")
+        self.spinBoxRecForS.setToolTip("Use this parameter with the next one (Every (s)) to only record at some specific intervals. "
+                                       "Use this parameter to set the duration of the recording sessions (in seconds)." 
+                                       "If set to 0, it will record continuously.")
+        self.spinBoxEveryH.setToolTip("Use this parameter with the previous one (Record for (s)) to only record at some specific intervals. "
+                                      "Use this parameter to set the period of recording sessions (in hours). "
+                                      "If set to 0, it will record continuously.")
+        self.spinTimeInterval.setToolTip("Period of frame acquisition.")
+        self.spinArchiveSize.setToolTip("Number of individual frames compressed into a single video file.")
+        self.spinStartingFrame.setToolTip("Frame number to start recording from.")
+        self.spinIlluminationPulse.setToolTip("Duration of the infrared illumination pulse, in milliseconds.")
+        self.checkBoxOptogen.setToolTip("Enable optogenetic stimulation.")
+        self.comboOptoColor.setToolTip("Select the color of the optogenetic stimulation. If the illumination board has only one color, this parameter is ignored.")
+        self.spinPulseDuration.setToolTip("Total duration of the optogenetic pulse, in seconds. The optogenetic pulse then consists "
+                                          "of a series of pulses with a duration of one second every two seconds (between each frame acquisition).")
+        self.spinPulseInterval.setToolTip("Interval between each optogenetic pulse, in seconds.")
+
+
+        self.checkBoxComputeChemotax.setToolTip("Directly compute chemotaxis index and mobility stats from the recorded video. "
+                                                "(Experimental, not working for single worm experiments)")
+        self.checkBoxLog.setToolTip("Log the experiment parameters and timestamps of actions in a text file.")
+        self.spinBoxVerbosity.setToolTip("Set the verbosity level of the log file. 0: no log, 1: only errors, 2: +warnings, 3: +info, "
+                                         "4. +debug outputs, 5. +trace of each step.")
+        self.lineEditUsername.setToolTip("Username to connect to the devices.")
+        self.lineEditSshDest.setToolTip("[SSH mode only] Destination host address of the device to store the recorded files.")
+
+        # Record
+        self.textRecordName.setToolTip("Name of the recording. It will be appended to the date and time of the recording.")
+        self.btnRecord.setToolTip("Start recording on the selected devices with the parameters defined above.")
+        self.btnStopRecord.setToolTip("Interrupt the recording on the selected devices by killing the process.")
+
+        self.btnDestDir.setToolTip("Open the destination directory of the recorded files.")
+
         self.listBoxDevices.setToolTip("List of connected devices. Devices in italic are currently running. "
-                                       "Edit the file hosts_list to add or remove devices.")
+                                       "Edit the file hosts_list.txt to add or remove devices.")
+        self.btnRescanDevices.setToolTip("Rescans all available devices (from hosts_list.txt).")
+        self.btnCheckUpdates.setToolTip("Check if updates are available for the selected devices.")
+        self.btnUpdateAll.setToolTip("Update all devices with available updates.")
+
+        self.btnClearTmpFolder.setToolTip("Clear the temporary folders on the selected devices. "
+                                          "These folders are used to store the recorded frames before they are compressed into a video file"
+                                          "and the video files before they are transferred to the NAS server.")
+
+        self.btnRunInstall.setToolTip("Run the installation script on all devices. This script will install the necessary dependencies "
+                                      "for the wormstation software, set permissions, etc.")
+
+        self.btnReboot.setToolTip("Reboot all devices. EVEN RUNNING ONES. Use with caution. Comment devices in hosts_list.txt to exclude them.")
+        self.btnShutdown.setToolTip("Shutdown all devices. EVEN RUNNING ONES. Use with caution. Comment devices in hosts_list.txt to exclude them.")
+
+
         # Add more tooltips as needed
 
     def install_event_filters(self):
-        widgets = [
-            self.btnRefresh, self.btnRescanDevices, self.sliderZoom, self.btnFitView, self.listBoxDevices
-            # Add more widgets as needed
-        ]
+        # Scan for all child widgets of the current UI
+        widgets = self.findChildren(QtWidgets.QWidget)
 
+        # Automatically filter widgets that have a tooltip set
         for widget in widgets:
-            widget.installEventFilter(self)
+            if widget.toolTip():  # Check if the widget has a tooltip
+                widget.installEventFilter(self)  # Install the event filter
 
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.Enter:
