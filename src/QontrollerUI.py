@@ -261,6 +261,9 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     '''
 
     def set_tooltips(self):
+
+        self.labelDisplay.setToolTip("Displays the current view of the selected device.")
+
         self.btnRefresh.setToolTip("Refreshes the current view. If the selected device is running, it will display the last recorded frame. "
                                    "Otherwise, it will acquire a new frame.")
         self.sliderZoom.setToolTip("Adjust the zoom level of the displayed image.")
