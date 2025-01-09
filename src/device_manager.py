@@ -151,7 +151,20 @@ class DeviceInstaller:
 
     def run_install_script(self):
         print(f'\n\n\nRUNNING INSTALL SCRIPT ON {self.name}\n')
-        stdin, stdout, stderr = self.ssh.exec_command(f"bash /home/{self.username}/piworm/INSTALL.sh -y", get_pty=True)
+
+        script_path = f"/home/{self.username}/piworm/INSTALL.sh"
+
+        # Check if the script exists
+        if not self.ssh.exists(script_path):
+            print(f"Error: Install script not found on {self.name}")
+            return
+        # Check if the script is executable
+        if not self.ssh.is_executable(script_path):
+            print(f"Warning: Install script is not executable on {self.name}. Making it executable...")
+            # Make the script executable
+            self.ssh.exec_command(f"chmod +x {script_path}")
+
+        stdin, stdout, stderr = self.ssh.exec_command(f"bash {script_path} -y", get_pty=True)
 
         # Function to send the password when sudo prompts for it
         def handle_password(stdin, stdout):
