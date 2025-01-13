@@ -132,7 +132,7 @@
              <x>0</x>
              <y>0</y>
              <width>266</width>
-             <height>1358</height>
+             <height>1364</height>
             </rect>
            </property>
            <property name="maximumSize">
@@ -1020,6 +1020,13 @@
                <widget class="QPushButton" name="btnClearTmpFolder">
                 <property name="text">
                  <string>Clear Tmp Folder</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnSelfDiagnosis">
+                <property name="text">
+                 <string>Run Self-Diagnosis</string>
                 </property>
                </widget>
               </item>

@@ -17,7 +17,7 @@ class ConfigWizard(QWizard):
         self.addPage(InitialConfigPage(configExists))
 
         # Add subsequent configuration pages
-        self.addPage(YourFirstConfigPage())
+        self.addPage(FirstConfigPage())
 
         self.setWindowTitle("Configuration Wizard")
 
@@ -80,9 +80,9 @@ class InitialConfigPage(QWizardPage):
 
 
 
-class YourFirstConfigPage(QWizardPage):
+class FirstConfigPage(QWizardPage):
     def __init__(self, parent=None):
-        super(YourFirstConfigPage, self).__init__(parent)
+        super(FirstConfigPage, self).__init__(parent)
         self.setTitle("Configuration Settings")
         self.layout = QVBoxLayout(self)
 

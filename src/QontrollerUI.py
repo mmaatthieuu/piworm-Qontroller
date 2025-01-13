@@ -1,5 +1,3 @@
-import time
-
 import paramiko.ssh_exception
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QMenu
@@ -12,12 +10,6 @@ import subprocess
 import sys
 import shutil
 
-from concurrent.futures import ThreadPoolExecutor
-
-import threading
-
-import getpass
-
 #from multiprocessing import Pool
 #from multiprocessing.pool import ThreadPool
 #from itertools import compress
@@ -27,8 +19,9 @@ import getpass
 
 from .device_manager import DeviceManager
 
-from .dialog_windows import showdialogInfo, showdialogWarning
+from .dialog_windows import showdialogInfo
 from .config_wizard import ConfigWizard, load_config, save_config
+from src.diagnostic_tools.diagnostic_window import SelfDiagnosticWindow
 
 
 IR_PIN = 17
@@ -727,6 +720,11 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_btnReboot_clicked(self):
         self.dm.reboot_devices()
+
+    @QtCore.pyqtSlot()
+    def on_btnSelfDiagnosis_clicked(self):
+        diagnostic_dialog = SelfDiagnosticWindow()
+        diagnostic_dialog.exec_()  # ✅ This makes it modal (blocks until closed)
 
     ### TAB 2
 
