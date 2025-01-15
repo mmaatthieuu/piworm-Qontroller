@@ -10,6 +10,7 @@ class DiagnosticEnvironment:
     """Represents a diagnostic environment with a list of tasks."""
 
     def __init__(self):
+        self.config = None
         self.device_manager = None
 
 
@@ -57,7 +58,10 @@ class DiagnosticManager(QObject):
 
         success = task.run(logger=self.log, environment=self.environment)  # ✅ Pass context
 
-        if success:
+        if success==2:
+            self.update_task_status(index, Task.STATUS_WARNING)
+            self.log(f"Task warning: {task.name}")
+        elif success:
             self.update_task_status(index, Task.STATUS_SUCCESS)
             self.log(f"Task succeeded: {task.name}")
         else:

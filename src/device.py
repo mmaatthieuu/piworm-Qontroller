@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui
 
 class Device:
 
-    def __init__(self, name, uptodate=None, username="scientist"):
+    def __init__(self, name, username, uptodate=None):
         self.name = name
         #self.id = id
         self.uptodate = uptodate
@@ -54,6 +54,7 @@ class Device:
 
     @property
     def is_uptodate(self):
+        # TODO: The file path is hardcoded. Make it configurable.
         stdin, stdout, stderr = self.ssh.exec_command(f"cd /home/{self.username}/piworm && git fetch --dry-run", get_pty=True)
         if stdout.readline() == '':
             print(self.name + " up to date")
@@ -63,6 +64,7 @@ class Device:
             return False
 
     def update(self):
+        # TODO: The file path is hardcoded. Make it configurable.
         if self.is_running:
             print("Device %s is running : update skipped" % self.name)
         else:
@@ -194,6 +196,7 @@ class Device:
 
     def turn_on_led(self, color, current='37.5mA'):
         """Turn on the LED of the specified color remotely."""
+        # TODO: check if this function is used and fix it or delete it
         self.ssh.exec_command(
             f"python ~/piworm/led_switch.py --color {color} --state 1 --current {current}",
             get_pty=True)
@@ -206,6 +209,7 @@ class Device:
 
     def turn_on_led_gpio(self, pin):
         """Old PCB. Turn on the LED of the specified color remotely."""
+        # TODO: path is hardcoded. Make it configurable.
         self.ssh.exec_command(f"python ~/piworm/src/led_control/turn_on_led.py {pin}", get_pty=True)
 
     def turn_off_led_gpio(self, pin):
@@ -213,6 +217,7 @@ class Device:
 
     def switch_led(self, color, state, current):
         """Switch the specified LED on or off with the specified current."""
+        # TODO: path is hardcoded. Make it configurable.
         # Execute the command and capture output
         stdin, stdout, stderr = self.ssh.exec_command(
             f"python ~/piworm/led_switch.py --color {color} --state {state} --current {current}",

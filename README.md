@@ -43,31 +43,38 @@ Example:
 ## Installation
 
 ### Prerequisites
-- List any dependencies or system requirements (e.g., Python version, libraries, operating system).
-
-Example:  
-- Python 3.8 or later  
-- Required Python libraries: `tkinter`, `PyQt5`, `pygame`, etc.
+- Python 3.9 or later  
 
 ### Steps
-1. Clone the repository:
+1. **Clone the repository:**  
+   ```bash
+   git clone https://github.com/mmaatthieuu/wormstation_controller.git
+   cd wormstation_controller
    ```
-   git clone https://github.com/username/repo.git
-   ```
-2. Navigate to the project directory:
-   ```
-   cd repo
-   ```
-3. Install dependencies:
+2. **_(Optional)_ Use a dedicated environment:**
+   - Using `conda`:  
+      ```bash
+      conda create --name wormstation python=3.9
+      conda activate wormstation
+      ```
+   
+   - Using `venv`:
+      ```bash
+      python -m venv wormstation
+      source wormstation/bin/activate # Linux/macOS
+     
+      wormstation\Scripts\activate.bat # Windows
+      ```
+
+3. **Install dependencies:**
    ```
    pip install -r requirements.txt
    ```
-4. Run the program:
+4. **Run the program:**
    ```
-   python main.py
+   python gui_launcher.py
    ```
 
-*(Optional: Mention installation through package managers or executables if available.)*
 
 ---
 

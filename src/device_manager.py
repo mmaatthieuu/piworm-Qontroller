@@ -60,16 +60,27 @@ class DeviceManager:
         if self.is_device_reachable(host):
             self.add_device(host, username=username)
 
-    def scan_devices(self, filename="hosts_list.txt", username="default_user"):
-        """Scan and add devices from the host list file in the order they appear."""
-        self.host_list.clear()
-        hosts = []
+    def get_selected_devices(self, filename):
+        """Get the list of selected devices from the host list file."""
+        list_of_selected_devices = []
+        try:
+            # Load hosts from file, maintaining order
+            with open(filename, 'r') as hosts_list:
+                for host in hosts_list.read().splitlines():
+                    if host and host[0] != '#':
+                        list_of_selected_devices.append(host)
 
-        # Load hosts from file, maintaining order
-        with open(filename, 'r') as hosts_list:
-            for host in hosts_list.read().splitlines():
-                if host and host[0] != '#':  # Skip comments
-                    hosts.append(host)
+            return list_of_selected_devices
+        except FileNotFoundError:
+            print("Host list file not found.")
+            return None
+
+    def scan_devices(self, filename, username):
+        """Scan and add devices from the host list file in the order they appear."""
+
+        # Clear the current device list
+        self.host_list.clear()
+        hosts = self.get_selected_devices(filename)
 
         # Perform reachability check in parallel and collect results
         reachability_results = self.execute_on_multiple_devices(self.is_device_reachable, hosts)
@@ -139,6 +150,10 @@ class DeviceManager:
         for device in device_list:
             remote_path = device.receive_json_config_file(config_file)
             device.record(remote_path)
+
+    def is_empty(self):
+        """Check if the device list is empty."""
+        return not bool(self.host_list)
 
 
 

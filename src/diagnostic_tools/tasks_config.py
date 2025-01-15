@@ -1,43 +1,63 @@
+import os
+import json
+
 from src.diagnostic_tools.task import Task
 from src.diagnostic_tools.diagnostic_tests import *
 
 
+"""
+Tasks to implement
+ - check local ssk key (for ssh-copy_id)
+ - check if ssh-copy-id is installed
+ - check if credentials are correct
+ - check if all install steps are successful
+ - check if led board is connected
+ - check if nas is available
+ - check if nas is mounted
+ - check that camera is connected
+ - check that leds are working
+
+
+"""
+
+# Automatically map task names to their corresponding functions
+TASK_FUNCTIONS = {
+    "LoadConfiguration": load_config_file,
+    "ConnectToRemoteDevices": connect_to_remote_devices,
+    "CheckClientsSoftwareVersion": check_clients_software_version
+}
+
+
+def load_task_messages():
+    """Load task messages from JSON."""
+    path = os.path.join(os.path.dirname(__file__), "task_messages.json")
+    with open(path, 'r') as file:
+        return json.load(file)
+
 def load_diagnostic_tasks():
-    """Creates a list of diagnostic tasks."""
+    """Dynamically create tasks based on the message file."""
+    messages = load_task_messages()
+    tasks = []
 
-    return [
-        Task("Fake Task",
-             "This task does nothing.",
-             "Task completed successfully.",
-             "Task failed.",
-             function=random_bool_delay),
-        Task("Check Network",
-             "Checking network connection...",
-             "Network is accessible.",
-             "Failed to access network.",
-             function=check_network),
+    for task_name, message_data in messages.items():
+        function = TASK_FUNCTIONS.get(task_name)
 
-        Task("Verify Disk Space",
-             "Verifying disk space...",
-             "Disk space is sufficient.",
-             "Disk space is low.",
-             function=check_disk_space),
+        if not function:
+            print(f"⚠️ Warning: No function found for task '{task_name}'")
+            continue  # Skip if no function is mapped
 
-        Task("Test Database",
-             "Testing database connection...",
-             "Database is reachable.",
-             "Failed to connect to the database.",
-             function=check_database),
+        # Automatically handle optional fields like 'warning'
+        warning_message = message_data.get("warning")
 
-        Task("Check Hardware",
-             "Checking hardware status...",
-             "Hardware is functioning.",
-             "Hardware issue detected.",
-             function=check_hardware),
+        # Dynamically create the Task instance
+        task = Task(
+            name=task_name.replace("_", " "),
+            description=message_data["description"],
+            success_message=message_data["success"],
+            failure_message=message_data["failure"],
+            function=function,
+            warning_message=warning_message
+        )
+        tasks.append(task)
 
-        Task("Validate Configurations",
-             "Validating configurations...",
-             "Configurations are valid.",
-             "Invalid configurations found.",
-             function=validate_configurations)
-    ]
+    return tasks

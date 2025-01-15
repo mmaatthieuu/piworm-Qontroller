@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QListWidget, QListWidgetItem,
-    QPushButton, QTextEdit, QApplication, QStyle
+    QPushButton, QTextEdit, QApplication, QStyle, QFileDialog, QMessageBox
 )
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -56,6 +56,10 @@ class SelfDiagnosticWindow(QDialog):
             "dialog-error", QApplication.style().standardIcon(QStyle.SP_MessageBoxCritical)
         )  # ❌ Failure icon
 
+        self.icon_warning = QIcon.fromTheme(
+            "dialog-warning-symbolic", QApplication.style().standardIcon(QStyle.SP_MessageBoxWarning)
+        )  # ⚠️ Warning icon
+
     def init_ui(self):
         layout = QVBoxLayout(self)
 
@@ -68,10 +72,17 @@ class SelfDiagnosticWindow(QDialog):
             self.task_list.addItem(item)
             self.task_items.append(item)
 
+        # 🔘 Show Details Button
         self.toggle_button = QPushButton("Show Details")
         self.toggle_button.clicked.connect(self.toggle_log)
         layout.addWidget(self.toggle_button)
 
+        # 💾 Save Log Button
+        self.save_log_button = QPushButton("Save Log")
+        self.save_log_button.clicked.connect(self.save_log_to_file)
+        layout.addWidget(self.save_log_button)
+
+        # 📝 Log Area
         self.log_area = QTextEdit()
         self.log_area.setReadOnly(True)
         self.log_area.setVisible(False)
@@ -99,6 +110,8 @@ class SelfDiagnosticWindow(QDialog):
             icon = self.icon_success
         elif status == Task.STATUS_FAILURE:
             icon = self.icon_failure
+        elif status == Task.STATUS_WARNING:
+            icon = self.icon_warning
         else:
             icon = self.icon_waiting  # Fallback
 
@@ -112,6 +125,23 @@ class SelfDiagnosticWindow(QDialog):
         is_visible = self.log_area.isVisible()
         self.log_area.setVisible(not is_visible)
         self.toggle_button.setText("Hide Details" if is_visible else "Show Details")
+
+    def save_log_to_file(self):
+        """Open a dialog to save the log content to a file."""
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Log File",
+            "diagnostic_log.txt",
+            "Text Files (*.txt);;All Files (*)"
+        )
+
+        if file_path:
+            try:
+                with open(file_path, 'w') as file:
+                    file.write(self.log_area.toPlainText())
+                QMessageBox.information(self, "Success", "Log saved successfully!")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to save log: {e}")
 
     def closeEvent(self, event):
         if self.worker and self.worker.isRunning():

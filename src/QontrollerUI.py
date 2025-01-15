@@ -1,6 +1,6 @@
 import paramiko.ssh_exception
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, QMenu
+from PyQt5.QtWidgets import QMessageBox, QMenu, QApplication
 import os
 from . import qontroller
 import json
@@ -68,6 +68,27 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     def __init__(self, parent=None):
         super(QontrollerUI, self).__init__(parent)
+
+        # Load or initialize configuration
+        self.config = load_config()
+
+        # If no configuration is found, run the configuration wizard
+        if not self.config:
+            wizard = ConfigWizard()
+
+            # Run the wizard and collect the data
+            if wizard.exec_():
+                self.config = wizard.collectData()  # Implement collectData to gather data from the wizard
+                save_config(self.config)
+            else:
+                # ❌ If the wizard is canceled, quit the program
+
+                print("Configuration wizard canceled. Exiting program.")
+
+                QApplication.quit()  # Gracefully quit the application
+                sys.exit()  # Exit the program
+
+
         self.setupUi(self)
 
         #self.resize(QtWidgets.QDesktopWidget().availableGeometry(self).size() * 0.8)
@@ -139,16 +160,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         self.scan_devices()
 
-        # Load or initialize configuration
-        self.config = load_config()
-        if not self.config:
-            wizard = ConfigWizard()
-            if wizard.exec_():
-                self.config = wizard.collectData() # Implement collectData to gather data from the wizard
-                save_config(self.config)
-            else:
-                # Handle cancellation or exit
-                self.close()
+
 
         # Thread:
 
@@ -297,8 +309,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.checkBoxLog.setToolTip("Log the experiment parameters and timestamps of actions in a text file.")
         self.spinBoxVerbosity.setToolTip("Set the verbosity level of the log file. 0: no log, 1: only errors, 2: +warnings, 3: +info, "
                                          "4. +debug outputs, 5. +trace of each step.")
-        self.lineEditUsername.setToolTip("Username to connect to the devices.")
-        self.lineEditSshDest.setToolTip("[SSH mode only] Destination host address of the device to store the recorded files.")
 
         # Record
         self.textRecordName.setToolTip("Name of the recording. It will be appended to the date and time of the recording.")
@@ -372,8 +382,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     def scan_devices(self):
         """Scan and display devices in the UI."""
-        username = self.lineEditUsername.text()
-        self.dm.scan_devices(username=username)  # Populate devices in DeviceManager
+        # Populate devices in DeviceManager
+        self.dm.scan_devices(filename=self.config["hosts_list_file"],username=self.config["username"])
 
         self.listBoxDevices.clear()
         for device in self.dm.host_list:

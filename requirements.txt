@@ -2,3 +2,11 @@
 # $ conda create --name <env> --file <this file>
 # platform: linux-64
 
+# PyQt5 for GUI
+PyQt5
+
+# Paramiko for SSH connections
+paramiko
+
+# Multiprocessing support (standard in Python, added for compatibility)
+multiprocessing
