@@ -2,7 +2,9 @@ import time
 
 import paramiko.ssh_exception
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, QMenu
+from PyQt5.QtWidgets import QMessageBox, QMenu, QInputDialog, QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QProgressBar, QCheckBox, QRadioButton, QComboBox, QSlider, QSpinBox, QScrollArea, QListWidgetItem
+from PyQt5.QtCore import pyqtSignal, QThread
 import os
 from . import qontroller
 import json
@@ -41,6 +43,69 @@ def get_device_updatable_status(device):
 
 def update_device(device):
     device.update()
+
+
+class PasswordDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Enter Password")
+        self.setModal(True)
+        self.setFixedSize(300, 150)
+
+        layout = QVBoxLayout(self)
+
+        self.label = QLabel("Enter your sudo password:", self)
+        layout.addWidget(self.label)
+
+        self.password_input = QLineEdit(self)
+        self.password_input.setEchoMode(QLineEdit.Password)
+        layout.addWidget(self.password_input)
+
+        self.button_ok = QPushButton("OK", self)
+        self.button_ok.clicked.connect(self.accept)
+        layout.addWidget(self.button_ok)
+
+    def get_password(self):
+        return self.password_input.text()
+
+class ProgressDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Installation in Progress")
+        self.setModal(True)
+        self.setFixedSize(300, 100)
+
+        layout = QVBoxLayout(self)
+        self.label = QLabel("Installing on devices. Please wait...", self)
+        layout.addWidget(self.label)
+
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setRange(0, 0)  # Indeterminate progress
+        layout.addWidget(self.progress_bar)
+
+        self.button_close = QPushButton("Close", self)
+        self.button_close.setEnabled(False)
+        self.button_close.clicked.connect(self.accept)
+        layout.addWidget(self.button_close)
+
+    def set_done(self):
+        self.label.setText("Installation complete.")
+        self.progress_bar.setRange(0, 1)  # Stop indeterminate progress
+        self.progress_bar.setValue(1)
+        self.button_close.setEnabled(True)
+
+
+class InstallWorker(QThread):
+    completed = pyqtSignal()
+
+    def __init__(self, dm, password, parent=None):
+        super().__init__(parent)
+        self.dm = dm
+        self.password = password
+
+    def run(self):
+        self.dm.install_on_all_devices(self.password)
+        self.completed.emit()
 
 
 class Worker(QtCore.QObject):
@@ -486,7 +551,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "smb_dir": 		"Misc/Matthieu-Schmidt/WORMSTATION_RECORDINGS/",
                      "local_output_dir":  None,
                      "output_filename":	"auto",
-                     "local_tmp_dir":    "wormstation_recordings",
+                     "local_tmp_dir":    ".wormstation_tmp",
                      "capture_timeout":	5.0,
                      "recording_name":  self.textRecordName.toPlainText(),
                      "compute_chemotaxis": self.checkBoxComputeChemotax.isChecked()}
@@ -718,7 +783,41 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def on_btnRunInstall_clicked(self):
-        self.dm.install_on_all_devices()
+        # Open the password dialog
+        dialog = PasswordDialog(self)
+        if dialog.exec_() == QDialog.Accepted:
+            password = dialog.get_password()
+            if password:
+                # Show the progress dialog
+                progress_dialog = ProgressDialog(self)
+                progress_dialog.show()
+
+                # Run the installation in a separate thread
+                worker = InstallWorker(self.dm, password, self)
+                worker.completed.connect(progress_dialog.set_done)
+                worker.completed.connect(worker.deleteLater)
+                worker.start()
+
+                # Wait for the worker to complete
+                progress_dialog.exec_()
+
+                QMessageBox.information(
+                    self,
+                    "Installation Complete",
+                    "The installation was successful."
+                )
+            else:
+                QMessageBox.warning(
+                    self,
+                    "Installation Aborted",
+                    "You must provide a password to proceed with the installation."
+                )
+        else:
+            QMessageBox.information(
+                self,
+                "Installation Canceled",
+                "Password input canceled by the user."
+            )
 
     @QtCore.pyqtSlot()
     def on_btnShutdown_clicked(self):

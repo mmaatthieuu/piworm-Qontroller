@@ -116,10 +116,12 @@ class DeviceManager:
         """Shutdown all devices in parallel."""
         self.execute_on_multiple_devices(lambda device: device.shutdown(), self.host_list)
 
-    def install_on_all_devices(self):
+    def install_on_all_devices(self, sudo_password=None):
         """Run installation on all devices with sudo password."""
-        sudo_password = getpass.getpass(prompt='Enter your sudo password: ')
+        if sudo_password is None:
+            sudo_password = getpass.getpass(prompt='Enter your sudo password: ')
         self.execute_on_multiple_devices(lambda device: DeviceInstaller(device, sudo_password).run_install_script(), self.host_list)
+        print("\nInstallation complete.")
 
     def switch_led(self, color, state, current, device_list):
         """Switch the LED on or off on all or selected devices in parallel."""
@@ -154,12 +156,15 @@ class DeviceInstaller:
 
         script_path = f"/home/{self.username}/piworm/INSTALL.sh"
 
-        # Check if the script exists
-        if not self.ssh.exists(script_path):
+        # Check if the install script exists
+        stdin, stdout, stderr = self.ssh.exec_command(f"ls {script_path}")
+        if stdout.channel.recv_exit_status() != 0:
             print(f"Error: Install script not found on {self.name}")
             return
+
         # Check if the script is executable
-        if not self.ssh.is_executable(script_path):
+        stdin, stdout, stderr = self.ssh.exec_command(f"test -x {script_path}")
+        if stdout.channel.recv_exit_status() != 0:
             print(f"Warning: Install script is not executable on {self.name}. Making it executable...")
             # Make the script executable
             self.ssh.exec_command(f"chmod +x {script_path}")
@@ -172,7 +177,8 @@ class DeviceInstaller:
                 if stdout.channel.recv_ready():
                     rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
                     if rl:
-                        line = stdout.channel.recv(1024).decode('utf-8')
+                        # Handle decoding errors gracefully
+                        line = stdout.channel.recv(1024).decode('utf-8', errors='replace')
                         sys.stdout.write(line)
                         if 'password' in line.lower():
                             stdin.write(f"{self.sudo_password}\n")
@@ -187,5 +193,10 @@ class DeviceInstaller:
         # Read any remaining output
         for line in iter(stdout.readline, ""):
             print(line, end="")
+
+        # Ensure the channels are closed
+        stdout.channel.close()
+        stdin.channel.close()
+        stderr.channel.close()
 
         print(f"Finished install script on {self.name}")
