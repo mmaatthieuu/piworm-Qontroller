@@ -486,7 +486,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "smb_dir": 		"Misc/Matthieu-Schmidt/WORMSTATION_RECORDINGS/",
                      "local_output_dir":  None,
                      "output_filename":	"auto",
-                     "local_tmp_dir":    ".wormstation_tmp",
+                     "local_tmp_dir":    "wormstation_recordings",
                      "capture_timeout":	5.0,
                      "recording_name":  self.textRecordName.toPlainText(),
                      "compute_chemotaxis": self.checkBoxComputeChemotax.isChecked()}
