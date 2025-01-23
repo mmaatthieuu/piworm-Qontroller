@@ -245,8 +245,8 @@ class Device:
         return log_folder
 
     def clear_tmp_folder(self):
-        print(f'Clear folder /home/{self.username}/.wormstation_tmp/ on {self.name}')
-        self.ssh.exec_command(f"rm -rf /home/{self.username}/.wormstation_tmp/*", get_pty=True)
+        print(f'Clear folder /home/{self.username}/wormstation_recordings/ on {self.name}')
+        self.ssh.exec_command(f"rm -rf /home/{self.username}/wormstation_recordings/*", get_pty=True)
 
 
 
