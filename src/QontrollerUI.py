@@ -467,6 +467,9 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                 # get the device currently selected
                 currentDevice = self.dm.get_device_by_id(self.currentDeviceID)
 
+                if currentDevice is None:
+                    return
+
                 config = self.generate_json_config_from_GUI_widgets(preview_mode=True)
                 file = self.save_json_config_file(config)
 
@@ -775,6 +778,27 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
     def uncheck_live_view(self):
         if self.btnLiveView.isChecked():
             self.btnLiveView.setChecked(False)
+
+    @QtCore.pyqtSlot()
+    def on_btnEditHostList_clicked(self):
+        """Open hosts_list.txt in the system's default text editor."""
+        filename = "hosts_list.txt"
+
+        # ✅ Ensure the file exists
+        if not os.path.exists(filename):
+            # Create an empty file if it doesn't exist
+            with open(filename, 'w') as f:
+                f.write("# List of hosts\n")  # Add a comment line as a placeholder
+
+        try:
+            if os.name == 'nt':  # Windows
+                os.startfile(filename)  # ✅ Opens with default app
+            elif sys.platform == "darwin":  # macOS
+                subprocess.run(["open", filename], check=True)
+            else:  # Linux/Unix
+                subprocess.run(["xdg-open", filename], check=True)
+        except Exception as e:
+            print(f"Error opening file: {e}")
 
     @QtCore.pyqtSlot()
     def on_btnClearTmpFolder_clicked(self):

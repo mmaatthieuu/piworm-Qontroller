@@ -65,16 +65,31 @@ class DeviceManager:
         self.host_list.clear()
         hosts = []
 
-        # Load hosts from file, maintaining order
-        with open(filename, 'r') as hosts_list:
-            for host in hosts_list.read().splitlines():
-                if host and host[0] != '#':  # Skip comments
-                    hosts.append(host)
+        # ✅ Check if the file exists
+        if not os.path.exists(filename):
+            print(f"Warning: The file '{filename}' does not exist.")
+            return  # Exit the function
 
-        # Perform reachability check in parallel and collect results
+        # ✅ Read the file safely
+        try:
+            with open(filename, 'r') as hosts_list:
+                for line in hosts_list:
+                    host = line.strip()
+                    if host and not host.startswith('#'):  # Skip empty lines and comments
+                        hosts.append(host)
+        except Exception as e:
+            print(f"Error reading the file '{filename}': {e}")
+            return  # Exit on file read error
+
+        # ✅ Handle empty file or no valid hosts
+        if not hosts:
+            print(f"Warning: The file '{filename}' is empty or contains only comments.")
+            return  # Exit the function
+
+        # ✅ Perform reachability check in parallel and collect results
         reachability_results = self.execute_on_multiple_devices(self.is_device_reachable, hosts)
 
-        # Add reachable devices in the correct order
+        # ✅ Add reachable devices in the correct order
         for host, is_reachable in zip(hosts, reachability_results):
             if is_reachable:
                 self.add_device(host, username=username)

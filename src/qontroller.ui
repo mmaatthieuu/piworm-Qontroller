@@ -132,7 +132,7 @@
              <x>0</x>
              <y>0</y>
              <width>266</width>
-             <height>1358</height>
+             <height>1364</height>
             </rect>
            </property>
            <property name="maximumSize">
@@ -992,6 +992,13 @@
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnEditHostList">
+                <property name="text">
+                 <string>Edit Host List</string>
                 </property>
                </widget>
               </item>
