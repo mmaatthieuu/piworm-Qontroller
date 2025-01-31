@@ -132,7 +132,7 @@
              <x>0</x>
              <y>0</y>
              <width>266</width>
-             <height>1364</height>
+             <height>1358</height>
             </rect>
            </property>
            <property name="maximumSize">
@@ -707,6 +707,16 @@
                   </property>
                  </widget>
                 </item>
+                <item row="11" column="0">
+                 <widget class="QLabel" name="label_25">
+                  <property name="text">
+                   <string>Color</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="11" column="1">
+                 <widget class="QComboBox" name="comboOptoColor"/>
+                </item>
                 <item row="12" column="0">
                  <widget class="QLabel" name="label_3">
                   <property name="text">
@@ -798,13 +808,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="19" column="1">
-                 <widget class="QLineEdit" name="lineEditSshDest">
-                  <property name="text">
-                   <string>128.178.66.169</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="19" column="0">
                  <widget class="QLabel" name="destination">
                   <property name="text">
@@ -822,6 +825,13 @@
                   </property>
                  </widget>
                 </item>
+                <item row="19" column="1">
+                 <widget class="QLineEdit" name="lineEditSshDest">
+                  <property name="text">
+                   <string>128.178.66.169</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="15" column="0">
                  <widget class="QLabel" name="label_24">
                   <property name="text">
@@ -829,34 +839,10 @@
                   </property>
                  </widget>
                 </item>
-                <item row="11" column="0">
-                 <widget class="QLabel" name="label_25">
-                  <property name="text">
-                   <string>Color</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="11" column="1">
-                 <widget class="QComboBox" name="comboOptoColor"/>
-                </item>
                </layout>
               </item>
               <item>
                <layout class="QGridLayout" name="gridLayout_10">
-                <item row="5" column="0">
-                 <widget class="QLabel" name="label_timeRecord">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QLabel" name="label_frame">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="0">
                  <spacer name="verticalSpacer_7">
                   <property name="orientation">
@@ -887,17 +873,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
-                 <widget class="QPushButton" name="btnRecord">
-                  <property name="text">
-                   <string>Start</string>
-                  </property>
-                  <property name="icon">
-                   <iconset theme="camera-on">
-                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
-                  </property>
-                 </widget>
-                </item>
                 <item row="4" column="1">
                  <widget class="QPushButton" name="btnStopRecord">
                   <property name="text">
@@ -905,6 +880,17 @@
                   </property>
                   <property name="icon">
                    <iconset theme="media-playback-stop">
+                    <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QPushButton" name="btnRecord">
+                  <property name="text">
+                   <string>Start</string>
+                  </property>
+                  <property name="icon">
+                   <iconset theme="camera-on">
                     <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
                   </property>
                  </widget>
@@ -937,6 +923,20 @@
                   </property>
                   <property name="acceptRichText">
                    <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QLabel" name="label_frame">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="label_timeRecord">
+                  <property name="text">
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -992,13 +992,6 @@
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnEditHostList">
-                <property name="text">
-                 <string>Edit Host List</string>
                 </property>
                </widget>
               </item>
