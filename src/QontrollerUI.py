@@ -828,7 +828,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                 QMessageBox.information(
                     self,
                     "Installation Complete",
-                    "The installation was successful."
+                    "The installation was successful.\nPlease reboot the devices to apply the changes."
                 )
             else:
                 QMessageBox.warning(
