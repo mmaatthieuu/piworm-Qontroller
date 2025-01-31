@@ -367,7 +367,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                                       "If set to 0, it will record continuously.")
         self.spinTimeInterval.setToolTip("Period of frame acquisition.")
         self.spinArchiveSize.setToolTip("Number of individual frames compressed into a single video file.")
-        self.spinStartingFrame.setToolTip("Frame number to start recording from.")
         self.spinIlluminationPulse.setToolTip("Duration of the infrared illumination pulse, in milliseconds.")
         self.checkBoxOptogen.setToolTip("Enable optogenetic stimulation.")
         self.comboOptoColor.setToolTip("Select the color of the optogenetic stimulation. If the illumination board has only one color, this parameter is ignored.")
@@ -376,8 +375,6 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.spinPulseInterval.setToolTip("Interval between each optogenetic pulse, in seconds.")
 
 
-        self.checkBoxComputeChemotax.setToolTip("Directly compute chemotaxis index and mobility stats from the recorded video. "
-                                                "(Experimental, not working for single worm experiments)")
         self.checkBoxLog.setToolTip("Log the experiment parameters and timestamps of actions in a text file.")
         self.spinBoxVerbosity.setToolTip("Set the verbosity level of the log file. 0: no log, 1: only errors, 2: +warnings, 3: +info, "
                                          "4. +debug outputs, 5. +trace of each step.")
@@ -546,7 +543,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "time_interval": 	self.spinTimeInterval.value(),
                      "shutter_speed":	self.spinShutterSpeed.value(),
                      "compress": 		self.spinArchiveSize.value(),
-                     "start_frame":		self.spinStartingFrame.value(),
+                     "start_frame":		0,
                      "illumination_pulse":  self.spinIlluminationPulse.value(),
                      "optogenetic":     self.checkBoxOptogen.isChecked(),
                      "optogenetic_color": self.comboOptoColor.currentText(),
@@ -567,7 +564,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "local_tmp_dir":    "wormstation_recordings",
                      "capture_timeout":	5.0,
                      "recording_name":  self.textRecordName.toPlainText(),
-                     "compute_chemotaxis": self.checkBoxComputeChemotax.isChecked()}
+                     "compute_chemotaxis": False}
 
         if preview_mode:
             json_dict["timeout"] = 0
