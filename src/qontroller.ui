@@ -517,30 +517,13 @@
                  </widget>
                 </item>
                 <item row="7" column="0">
-                 <widget class="QLabel" name="label_6">
-                  <property name="text">
-                   <string>Starting Frame</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="1">
-                 <widget class="QSpinBox" name="spinStartingFrame">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="maximum">
-                   <number>1000000000</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="8" column="0">
                  <widget class="QLabel" name="label_64">
                   <property name="text">
                    <string>Illumination dur.</string>
                   </property>
                  </widget>
                 </item>
-                <item row="8" column="1">
+                <item row="7" column="1">
                  <widget class="QSpinBox" name="spinIlluminationPulse">
                   <property name="maximum">
                    <number>2000</number>
@@ -550,7 +533,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="9" column="1">
+                <item row="8" column="1">
                  <spacer name="verticalSpacer">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
@@ -566,7 +549,7 @@
                   </property>
                  </spacer>
                 </item>
-                <item row="10" column="0">
+                <item row="9" column="0">
                  <widget class="QLabel" name="label_20">
                   <property name="palette">
                    <palette>
@@ -697,7 +680,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="10" column="1">
+                <item row="9" column="1">
                  <widget class="QCheckBox" name="checkBoxOptogen">
                   <property name="text">
                    <string/>
@@ -707,24 +690,24 @@
                   </property>
                  </widget>
                 </item>
-                <item row="11" column="0">
+                <item row="10" column="0">
                  <widget class="QLabel" name="label_25">
                   <property name="text">
                    <string>Color</string>
                   </property>
                  </widget>
                 </item>
-                <item row="11" column="1">
+                <item row="10" column="1">
                  <widget class="QComboBox" name="comboOptoColor"/>
                 </item>
-                <item row="12" column="0">
+                <item row="11" column="0">
                  <widget class="QLabel" name="label_3">
                   <property name="text">
                    <string>Pulse  duration (s)</string>
                   </property>
                  </widget>
                 </item>
-                <item row="12" column="1">
+                <item row="11" column="1">
                  <widget class="QSpinBox" name="spinPulseDuration">
                   <property name="maximum">
                    <number>120</number>
@@ -734,14 +717,14 @@
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="0">
+                <item row="12" column="0">
                  <widget class="QLabel" name="label_21">
                   <property name="text">
                    <string>Interval (s)</string>
                   </property>
                  </widget>
                 </item>
-                <item row="13" column="1">
+                <item row="12" column="1">
                  <widget class="QSpinBox" name="spinPulseInterval">
                   <property name="maximum">
                    <number>999999999</number>
@@ -751,7 +734,7 @@
                   </property>
                  </widget>
                 </item>
-                <item row="14" column="1">
+                <item row="13" column="1">
                  <spacer name="verticalSpacer_6">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
@@ -767,31 +750,14 @@
                   </property>
                  </spacer>
                 </item>
-                <item row="15" column="0">
-                 <widget class="QLabel" name="label_24">
-                  <property name="text">
-                   <string>Auto  Analysis</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="15" column="1">
-                 <widget class="QCheckBox" name="checkBoxComputeChemotax">
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="checked">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item row="16" column="0">
+                <item row="14" column="0">
                  <widget class="QLabel" name="label_14">
                   <property name="text">
                    <string>Log output</string>
                   </property>
                  </widget>
                 </item>
-                <item row="16" column="1">
+                <item row="14" column="1">
                  <widget class="QCheckBox" name="checkBoxLog">
                   <property name="text">
                    <string/>
@@ -801,15 +767,19 @@
                   </property>
                  </widget>
                 </item>
-                <item row="17" column="0">
+                <item row="15" column="0">
                  <widget class="QLabel" name="label_13">
                   <property name="text">
                    <string>Verbosity</string>
                   </property>
                  </widget>
                 </item>
-                <item row="17" column="1">
-                 <widget class="QSpinBox" name="spinBoxVerbosity"/>
+                <item row="15" column="1">
+                 <widget class="QSpinBox" name="spinBoxVerbosity">
+                  <property name="value">
+                   <number>5</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
