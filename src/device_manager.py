@@ -158,6 +158,11 @@ class DeviceManager:
             remote_path = device.receive_json_config_file(config_file)
             device.record(remote_path)
 
+    @property
+    def is_empty(self):
+        """Check if the device list is empty."""
+        return not self.host_list
+
 
 
 class DeviceInstaller:

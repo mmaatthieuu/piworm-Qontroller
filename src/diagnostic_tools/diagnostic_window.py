@@ -21,7 +21,7 @@ class DiagnosticWorker(QThread):
     def run(self):
         self.manager.run()
 
-class SelfDiagnosticWindow(QDialog):
+class SelfCheckWindow(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("System Self-Diagnosis")
@@ -156,6 +156,6 @@ class SelfDiagnosticWindow(QDialog):
 # Run the application
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = SelfDiagnosticWindow()
+    window = SelfCheckWindow()
     window.exec_()
     sys.exit(app.exec_())

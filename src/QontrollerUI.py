@@ -31,7 +31,7 @@ from .device_manager import DeviceManager
 
 from .dialog_windows import showdialogInfo
 from .config_wizard import ConfigWizard, load_config, save_config
-from src.diagnostic_tools.diagnostic_window import SelfDiagnosticWindow
+from src.diagnostic_tools.diagnostic_window import SelfCheckWindow
 
 
 IR_PIN = 17
@@ -555,7 +555,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "annotate_frames": True,
                      "use_samba":		True,
                      "use_ssh":			False,
-                     "ssh_destination": self.lineEditSshDest.text(),
+                     "ssh_destination": None,
                      "ssh_dir":         "/media/scientist/SanDisk",
                      "nas_server":		"//lpbsnas1.epfl.ch",
                      "share_name":		"LPBS2",
@@ -862,8 +862,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.dm.reboot_devices()
 
     @QtCore.pyqtSlot()
-    def on_btnSelfDiagnosis_clicked(self):
-        diagnostic_dialog = SelfDiagnosticWindow()
+    def on_btnSelfCheck_clicked(self):
+        diagnostic_dialog = SelfCheckWindow()
         diagnostic_dialog.exec_()  # ✅ This makes it modal (blocks until closed)
 
     ### TAB 2

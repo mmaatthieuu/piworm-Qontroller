@@ -67,7 +67,7 @@ def connect_to_remote_devices(logger=None, environment=None):
             unreachable_devices.append(device)
             logger(f"Failed to connect to {device}.")
 
-    if environment.device_manager.is_empty():
+    if environment.device_manager.is_empty:
         logger("Failed to connect to all devices.")
         return 0
     if unreachable_devices:
