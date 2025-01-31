@@ -1,0 +1,19 @@
+{
+  "LoadConfiguration": {
+    "description": "Loading configuration...",
+    "success": "Configuration loaded successfully.",
+    "failure": "Failed to load configuration."
+  },
+  "ConnectToRemoteDevices": {
+    "description": "Connecting to remote devices...",
+    "success": "Connected to all devices.",
+    "failure": "Failed to connect to all devices.",
+    "warning": "Could not connect to some devices."
+  },
+  "CheckClientsSoftwareVersion": {
+    "description": "Checking devices software version...",
+    "success": "All devices are up to date.",
+    "failure": "Some devices need updating.",
+    "warning": "Some devices are not up to date."
+  }
+}

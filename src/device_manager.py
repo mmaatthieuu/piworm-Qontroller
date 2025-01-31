@@ -60,26 +60,27 @@ class DeviceManager:
         if self.is_device_reachable(host):
             self.add_device(host, username=username)
 
-    def scan_devices(self, filename="hosts_list.txt", username="default_user"):
-        """Scan and add devices from the host list file in the order they appear."""
-        self.host_list.clear()
-        hosts = []
-
-        # ✅ Check if the file exists
-        if not os.path.exists(filename):
-            print(f"Warning: The file '{filename}' does not exist.")
-            return  # Exit the function
-
-        # ✅ Read the file safely
+    def get_selected_devices(self, filename):
+        """Get the list of selected devices from the host list file."""
+        list_of_selected_devices = []
         try:
+            # Load hosts from file, maintaining order
             with open(filename, 'r') as hosts_list:
-                for line in hosts_list:
-                    host = line.strip()
-                    if host and not host.startswith('#'):  # Skip empty lines and comments
-                        hosts.append(host)
-        except Exception as e:
-            print(f"Error reading the file '{filename}': {e}")
-            return  # Exit on file read error
+                for host in hosts_list.read().splitlines():
+                    if host and host[0] != '#':
+                        list_of_selected_devices.append(host)
+
+            return list_of_selected_devices
+        except FileNotFoundError:
+            print("Host list file not found.")
+            return None
+
+    def scan_devices(self, filename, username):
+        """Scan and add devices from the host list file in the order they appear."""
+
+        # Clear the current device list
+        self.host_list.clear()
+        hosts = self.get_selected_devices(filename)
 
         # ✅ Handle empty file or no valid hosts
         if not hosts:
