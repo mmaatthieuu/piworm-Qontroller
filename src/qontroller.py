@@ -361,6 +361,7 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(15, QtWidgets.QFormLayout.FieldRole, self.spinBoxVerbosity)
         self.verticalLayout_2.addLayout(self.formLayout)
         self.gridLayout_10 = QtWidgets.QGridLayout()
+        self.gridLayout_10.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.gridLayout_10.setObjectName("gridLayout_10")
         self.label_16 = QtWidgets.QLabel(self.scrollAreaWidgetContents_9)
         font = QtGui.QFont()

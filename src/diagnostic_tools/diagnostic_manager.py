@@ -9,9 +9,10 @@ from src.diagnostic_tools.task import Task
 class DiagnosticEnvironment:
     """Represents a diagnostic environment with a list of tasks."""
 
-    def __init__(self):
+    def __init__(self, remote_config_file=None):
         self.config = None
         self.device_manager = None
+        self.remote_config_file = remote_config_file
 
 
 
@@ -22,11 +23,11 @@ class DiagnosticManager(QObject):
     status_update_signal = pyqtSignal(int, str)  # ✅ Signal for task status updates
 
 
-    def __init__(self):
+    def __init__(self, remote_config_file=None):
         super().__init__()
         self.tasks = load_diagnostic_tasks()  # ✅ Load tasks internally
         self.logs = []
-        self.environment = DiagnosticEnvironment()  # ✅ Initialize environment
+        self.environment = DiagnosticEnvironment(remote_config_file)  # ✅ Initialize environment
 
     def get_tasks(self):
         """Return the list of tasks."""

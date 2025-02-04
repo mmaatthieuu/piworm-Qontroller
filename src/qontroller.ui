@@ -785,6 +785,9 @@
               </item>
               <item>
                <layout class="QGridLayout" name="gridLayout_10">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetMinimumSize</enum>
+                </property>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_16">
                   <property name="font">

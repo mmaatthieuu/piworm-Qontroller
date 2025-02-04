@@ -30,7 +30,7 @@ import getpass
 from .device_manager import DeviceManager
 
 from .dialog_windows import showdialogInfo
-from .config_wizard import ConfigWizard, load_config, save_config
+from .config_wizard import ConfigWizard, load_config, save_config, is_config_outdated
 from src.diagnostic_tools.diagnostic_window import SelfCheckWindow
 
 
@@ -146,7 +146,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
         self.config = load_config()
 
         # If no configuration is found, run the configuration wizard
-        if not self.config:
+        if not self.config or is_config_outdated():
             wizard = ConfigWizard()
 
             # Run the wizard and collect the data
@@ -183,6 +183,8 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
         self.host_list = []
         self.currentDeviceID = None
+
+        self.stop_count = 0
 
         self.full_pixmap = None
         self.zoom_value = self.sliderZoom.value()
@@ -561,7 +563,7 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
                      "smb_dir": 		"Misc/Matthieu-Schmidt/WORMSTATION_RECORDINGS/",
                      "local_output_dir":  None,
                      "output_filename":	"auto",
-                     "local_tmp_dir":    "wormstation_recordings",
+                     "local_tmp_dir":    self.config["recording_folder"],
                      "capture_timeout":	5.0,
                      "recording_name":  self.textRecordName.toPlainText(),
                      "compute_chemotaxis": False}
@@ -694,11 +696,19 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def on_btnStopRecord_clicked(self):
+        self.stop_count += 1
+        killed = False
         self.on_btnLiveView_clicked(False)
         devices_marked_for_recording = self.get_devices_selected_devices(exclude_running=False)
         for d in self.dm.running_devices():
             if d in devices_marked_for_recording:
-                d.stop()
+                if self.stop_count < 5:
+                    d.stop()
+                else:
+                    d.kill()
+                    killed = True
+        if killed:
+            self.stop_count = 0
 
 
     def switch_led(self, color, current='37.5mA', all_devices=False):
@@ -860,7 +870,12 @@ class QontrollerUI(QtWidgets.QMainWindow, qontroller.Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def on_btnSelfCheck_clicked(self):
-        diagnostic_dialog = SelfCheckWindow()
+
+        # generate the json config file
+        config = self.generate_json_config_from_GUI_widgets(preview_mode=False)
+        remote_config_file = self.save_json_config_file(config)
+
+        diagnostic_dialog = SelfCheckWindow(remote_config_file)
         diagnostic_dialog.exec_()  # ✅ This makes it modal (blocks until closed)
 
     ### TAB 2

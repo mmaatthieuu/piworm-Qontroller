@@ -7,6 +7,7 @@ import sys
 import select
 import time
 import signal
+import json
 
 from PyQt5 import QtCore, QtGui
 
@@ -73,6 +74,7 @@ class Device:
                 print(line, end="")
             print("Device %s updated" % self.name)
 
+
     def ssh_connect(self):
         self.connected = False
         i = 0
@@ -104,6 +106,16 @@ class Device:
                 pass  # Folder already exists
             sftp.put(file, remote_path)
         return remote_path
+
+    def remove_json_config_file(self, file):
+        with self.ssh.open_sftp() as sftp:
+            try:
+                remote_path = f'/home/{self.username}/.config/wormstation/{os.path.basename(file)}'
+                sftp.remove(remote_path)
+                print(f"File {file} removed from device {self.name}")
+            except FileNotFoundError:
+                print(f"File {file} not found on device {self.name}")
+
 
     def get_frame(self, settings_remote_path):
         status = self.recording_status
@@ -184,6 +196,10 @@ class Device:
         stdin, stdout, stderr = self.ssh.exec_command("pkill picam", get_pty=True)
         print("Device %s stopped" % self.name)
 
+    def kill(self):
+        stdin, stdout, stderr = self.ssh.exec_command("pkill -9 picam", get_pty=True)
+        print("Device %s killed" % self.name)
+
     def shutdown(self):
         print("shutting down %s" % self.name)
         stdin, stdout, stderr = self.ssh.exec_command("sudo poweroff", get_pty=True)
@@ -217,10 +233,9 @@ class Device:
 
     def switch_led(self, color, state, current):
         """Switch the specified LED on or off with the specified current."""
-        # TODO: path is hardcoded. Make it configurable.
         # Execute the command and capture output
         stdin, stdout, stderr = self.ssh.exec_command(
-            f"python ~/piworm/led_switch.py --color {color} --state {state} --current {current}",
+            f"led_switch --color {color} --state {state} --current {current}",
             get_pty=True
         )
 
@@ -252,6 +267,148 @@ class Device:
     def clear_tmp_folder(self):
         print(f'Clear folder /home/{self.username}/wormstation_recordings/ on {self.name}')
         self.ssh.exec_command(f"rm -rf /home/{self.username}/wormstation_recordings/*", get_pty=True)
+
+
+
+
+    def get_NAS_status(self, config_file):
+        """Check NAS accessibility and mount status."""
+        remote_path = self.receive_json_config_file(config_file)
+        command = f"self_check NAS_status {remote_path}"
+        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+
+        # Read and decode the output
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        if error:
+            print(f"SSH Command Error: {error}")
+            return None  # Handle failure case
+
+        try:
+            # Parse the JSON output from self_check.py
+            result = json.loads(output)
+            return result  # ✅ Return structured data
+        except json.JSONDecodeError:
+            print(f"Invalid JSON output received: {output}")
+            return None
+
+
+    def mount_NAS(self, config_file):
+        """Mount the NAS if it's accessible but not already mounted."""
+        remote_path = self.receive_json_config_file(config_file)
+        command = f"self_check mount_NAS {remote_path}"
+        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+
+        # Read and decode the output
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        if error:
+            print(f"SSH Command Error: {error}")
+            return None
+
+        try:
+            # Parse the JSON output from self_check.py
+            result = json.loads(output)
+            return result  # ✅ Return structured data
+        except json.JSONDecodeError:
+            print(f"Invalid JSON output received: {output}")
+            return None
+
+    def check_camera(self, config_file):
+        """Check if the camera is connected."""
+        remote_path = self.receive_json_config_file(config_file)
+        command = f"self_check camera_status {remote_path}"
+        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+
+        # Read and decode the output
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        if error:
+            print(f"SSH Command Error: {error}")
+            return None
+
+        try:
+            # Parse the JSON output from self_check.py
+            result = json.loads(output)
+            return result  # ✅ Return structured data
+        except json.JSONDecodeError:
+            print(f"Invalid JSON output received: {output}")
+            return None
+
+
+    def check_disk_space(self, config_file):
+        """Check the disk space on the device."""
+        remote_path = self.receive_json_config_file(config_file)
+        command = f"self_check disk_space {remote_path}"
+        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+
+        # Read and decode the output
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        if error:
+            print(f"SSH Command Error: {error}")
+            return None
+
+        try:
+            # Parse the JSON output from self_check.py
+            result = json.loads(output)
+            return result  # ✅ Return structured data
+        except json.JSONDecodeError:
+            print(f"Invalid JSON output received: {output}")
+            return None
+
+    def auto_LED_test(self, config_file):
+        """Check if the LEDs are working."""
+        remote_path = self.receive_json_config_file(config_file)
+        command = f"self_check auto_LED_test {remote_path}"
+        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+
+        # Read and decode the output
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        # filter out libcamera info messages
+        lines = output.split("\n")
+        # Discard lines starting with '['
+        output = "\n".join([line for line in lines if not line.startswith("[")])
+
+        if error:
+            print(f"SSH Command Error: {error}")
+            return None
+
+        try:
+            # Parse the JSON output from self_check.py
+            result = json.loads(output)
+            return result  # ✅ Return structured data
+        except json.JSONDecodeError:
+            print(f"Invalid JSON output received: {output}")
+            return None
+
+    def get_tmp_files(self, config_file):
+        """Get the list of temporary files on the device."""
+        remote_path = self.receive_json_config_file(config_file)
+        command = f"self_check tmp_files {remote_path}"
+        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=True)
+
+        # Read and decode the output
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        if error:
+            print(f"SSH Command Error: {error}")
+            return None
+
+        try:
+            # Parse the JSON output from self_check.py
+            result = json.loads(output)
+            return result  # ✅ Return structured data
+        except json.JSONDecodeError:
+            print(f"Invalid JSON output received: {output}")
+            return None
 
 
 

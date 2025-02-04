@@ -4,8 +4,11 @@ import json
 import os
 import subprocess
 import platform
+import datetime
 
 CONFIG_FILE = 'config.json'
+EXPIRATION_DATE = datetime.datetime(2025, 2, 1)  # February 1st, 2025
+
 
 class ConfigWizard(QWizard):
     InitialConfigPageId = 0
@@ -235,13 +238,20 @@ class HostConfigPage(QWizardPage):
         self.layout.addWidget(self.usernameInput)
         self.usernameInput.setText("scientist")
 
+        # Recording folder
+        self.recordingFolderInput = QLineEdit()
+        self.layout.addWidget(QLabel("Recording folder (relative to ~/):"))
+        self.layout.addWidget(self.recordingFolderInput)
+        self.recordingFolderInput.setText("wormstation_recordings")
+
         self.setLayout(self.layout)
 
     def collect_data(self):
         # Collect data from UI components
         data = {
             "hosts_list_file": self.hostInput.text() or "./hosts_list.txt",  # ✅ Fallback to placeholder
-            "username": self.usernameInput.text() or "scientist"  # ✅ Fallback to placeholder
+            "username": self.usernameInput.text() or "scientist",  # ✅ Fallback to placeholder
+            "recording_folder": self.recordingFolderInput.text() or "wormstation_recordings"  # ✅ Fallback to placeholder
         }
         return data
 
@@ -357,4 +367,12 @@ def load_config(filename=CONFIG_FILE):
             return json.load(f)
     except FileNotFoundError:
         return None
+
+def is_config_outdated(filename=CONFIG_FILE):
+    """Check if the configuration file is older than February 1st, 2025."""
+    if not os.path.exists(filename):
+        return True  # Consider missing files as outdated
+
+    last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(filename))
+    return last_modified < EXPIRATION_DATE
 

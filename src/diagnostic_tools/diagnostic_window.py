@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QThread, pyqtSignal
 import sys
+import os
 
 from src.diagnostic_tools.diagnostic_manager import DiagnosticManager
 from src.diagnostic_tools.task import Task
@@ -22,13 +23,14 @@ class DiagnosticWorker(QThread):
         self.manager.run()
 
 class SelfCheckWindow(QDialog):
-    def __init__(self):
+    def __init__(self, remote_config_file=None):
         super().__init__()
         self.setWindowTitle("System Self-Diagnosis")
         self.resize(600, 600)
         self.setModal(True)
+        self.remote_config_file = remote_config_file
 
-        self.manager = DiagnosticManager()  # ✅ Initialize with logger
+        self.manager = DiagnosticManager(remote_config_file)  # ✅ Initialize with logger
         self.manager.log_signal.connect(self.append_log)  # ✅ Connect signal
         self.manager.status_update_signal.connect(self.update_task_status)
 
@@ -144,6 +146,16 @@ class SelfCheckWindow(QDialog):
                 QMessageBox.critical(self, "Error", f"Failed to save log: {e}")
 
     def closeEvent(self, event):
+
+        # if self.remote_config_file exists delete it the file
+        if self.remote_config_file:
+            try:
+                print(f"Deleting config file: {self.remote_config_file}")
+                os.remove(self.remote_config_file)
+            except Exception as e:
+                print(f"Failed to delete remote config file: {e}")
+
+
         if self.worker and self.worker.isRunning():
             self.worker.quit()
             self.worker.wait()

@@ -15,5 +15,39 @@
     "success": "All devices are up to date.",
     "failure": "Some devices need updating.",
     "warning": "Some devices are not up to date."
+  },
+  "CheckNasConnection": {
+    "description": "Checking NAS connection...",
+    "success": "All devices can ping the NAS.",
+    "failure": "At least one device cannot reach the NAS."
+  },
+  "CheckNasMount": {
+    "description": "Checking NAS mount...",
+    "success": "All devices have the NAS mounted.",
+    "failure": "At least one device could not connect to the NAS."
+  },
+  "CheckCamera": {
+    "description": "Checking camera...",
+    "success": "Camera is working for all devices.",
+    "failure": "Camera is not working on at least one device.",
+    "warning": "All device are running, check skipped."
+  },
+  "CheckDiskSpace": {
+    "description": "Checking disk space...",
+    "success": "All devices have enough disk space. (>= 10Gb)",
+    "failure": "Some devices are running out of disk space. (< 5Gb)",
+    "warning": "Some devices are running low on disk space. (< 10Gb)"
+  },
+  "AutoLedCheck": {
+    "description": "Checking LEDs for Non-running devices...",
+    "success": "All LEDs are working for non-running devices.",
+    "failure": "Some LEDs are not working for non running devices.",
+    "warning": "All devices are running. Skipping LED test."
+  },
+  "GetTmpFiles": {
+    "description": "Getting temporary recording files...",
+    "success": "No excessive recording files found.",
+    "failure": "Several recording files found.",
+    "warning": "Maybe to many recording files found."
   }
 }

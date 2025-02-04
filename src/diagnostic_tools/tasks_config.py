@@ -24,7 +24,13 @@ Tasks to implement
 TASK_FUNCTIONS = {
     "LoadConfiguration": load_config_file,
     "ConnectToRemoteDevices": connect_to_remote_devices,
-    "CheckClientsSoftwareVersion": check_clients_software_version
+    "CheckClientsSoftwareVersion": check_clients_software_version,
+    "CheckNasConnection": check_NAS_connection,
+    "CheckNasMount": check_NAS_mount,
+    "CheckDiskSpace": check_disk_space,
+    "CheckCamera": check_camera,
+    "AutoLedCheck": auto_LED_test,
+    "GetTmpFiles": get_tmp_files
 }
 
 
